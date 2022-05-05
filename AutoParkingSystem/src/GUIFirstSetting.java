@@ -13,8 +13,10 @@ import javax.swing.SwingConstants;
 
 public class GUIFirstSetting extends JFrame{
 	private JPanel p = new JPanel();
+	
     private JButton SettingButton = new JButton("설정"); // 설정 버튼
-    Font font = new Font("고딕", Font.BOLD, 50);
+    
+    private Font font = new Font("고딕", Font.BOLD, 50);
 
     private JLabel placeLabel = new JLabel("▶ 주차 공간 설정");
     private JLabel detailLabel = new JLabel("<html>(최소 가로 1칸/세로 1칸<br/>최대 가로 10칸 세로 15칸 설정 가능)</html>");
@@ -112,7 +114,7 @@ public class GUIFirstSetting extends JFrame{
 
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) { // 실행 테스트를 위한 코드
 		new GUIFirstSetting();
 	}
 }

@@ -12,8 +12,10 @@ import javax.swing.SwingConstants;
 
 public class GUIFirst extends JFrame{
 	private JPanel p = new JPanel();
+	
     private JButton loginButton = new JButton("로그인"); // 로그인 버튼
-    Font font = new Font("고딕", Font.BOLD, 50);
+    
+    private Font font = new Font("고딕", Font.BOLD, 50);
 
     private JLabel IDLabel = new JLabel("관리자 ID :");
     private JLabel passwordLabel = new JLabel("비밀번호 :");
@@ -95,7 +97,7 @@ public class GUIFirst extends JFrame{
     }
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) {  // 실행 테스트를 위한 코드
 		new GUIFirst();
 	}
 }
