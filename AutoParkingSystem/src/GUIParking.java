@@ -54,12 +54,12 @@ public class GUIParking extends JFrame{
         parkingButton.setSize(200, 80);
         parkingButton.setFont(font);
 
-        p.add(cancleButton);
-        p.add(parkingButton);
         p.add(carNumLabel);
         p.add(placeLabel);
         p.add(carNumText);
         p.add(placeText);
+        p.add(cancleButton);
+        p.add(parkingButton);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정
