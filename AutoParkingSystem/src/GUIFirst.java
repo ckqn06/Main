@@ -88,6 +88,6 @@ public class GUIFirst extends JFrame{
     }
     
 	public static void main(String[] args) { // 실행 테스트를 위한 코드
-		new GUIAdminLogin();
+		new GUIFirst();
 	}
 }
