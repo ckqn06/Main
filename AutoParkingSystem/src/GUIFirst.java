@@ -68,7 +68,6 @@ public class GUIFirst extends JFrame{
 
     private void eventListner() { //버튼 클릭 이벤트 설정
         loginButton.addActionListener(new ActionListener() { //로그인 버튼 클릭시 실행
-            @Override
             public void actionPerformed(ActionEvent e) {
             	//ID와 비밀번호가 맞다면
             	if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) {
