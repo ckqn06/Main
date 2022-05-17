@@ -22,7 +22,7 @@ public class GUIAdminSetting extends JFrame{
     
     File f = new File("관리자 데이터 파일.txt");
 
-    GUIAdminSetting(){  //화면 기본 설정
+    GUIAdminSetting(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -111,13 +111,13 @@ public class GUIAdminSetting extends JFrame{
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //범위 안의 수인지 확인
         				OutputStream os = new FileOutputStream(f);
-        				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간 당 주차 비용:"+pay );
+        				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간 당 주차 비용:"+pay);
         				byte[] by = str.getBytes();
         				os.write(by);			
         				
         				JOptionPane.showMessageDialog(null, "설정 값이 정상적으로 적용됐습니다");
         				dispose(); 
-        				new GUIMain();  // 메인화면으로
+        				new GUIMain(); //메인화면으로
         			} else { //값이 범위를 벗어났을 때 실행
         				JOptionPane.showMessageDialog(null, "범위 값 안의 값을 입력해주세요");
         			}
@@ -137,14 +137,14 @@ public class GUIAdminSetting extends JFrame{
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //범위 안의 수인지 확인
         				OutputStream os = new FileOutputStream(f);
-        				String str = ("가로 값:" + width + "\n세로 값:" + height + "\n시간 당 주차 비용:" + pay );
+        				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간 당 주차 비용:"+pay);
         				System.out.println(str);
         				byte[] by = str.getBytes();
         				os.write(by);
         				
         				JOptionPane.showMessageDialog(null, "변경하신 설정 값이 정상적으로 적용됐습니다");
         				dispose(); 
-        				new GUIMain();  // 메인화면으로
+        				new GUIMain(); //메인화면으로
         			} else { //값이 범위를 벗어났을 때 실행
         				JOptionPane.showMessageDialog(null, "범위 값 안의 값을 입력해주세요");
         			}
