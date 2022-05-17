@@ -1,9 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.io.*;
 
 public class GUIMain extends JFrame {
     private JPanel p = new JPanel();
@@ -175,7 +174,7 @@ public class GUIMain extends JFrame {
         parkButton.addActionListener(new ActionListener() { //주차하기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
-        		new GUIParking();  // 주차하기 화면으로
+        		new GUIParking(); //주차하기 화면으로
         	}
         });
         
@@ -189,6 +188,8 @@ public class GUIMain extends JFrame {
         searchButton.addActionListener(new ActionListener() { //검색 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		//고객 테이블의 점보와 입력창에 적힌 번호를 비교하여 맞으면 결과값을 메시지로 반환
+        		dispose();
+        		new GUISearch(); //결제할 차량 번호 입력 화면으로 
         	}
         });
         
@@ -201,15 +202,13 @@ public class GUIMain extends JFrame {
         
         quitButton.addActionListener(new ActionListener() { //시스템 종료 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);
-        		if(result == JOptionPane.YES_OPTION) { //Yes를 선택할 경우
-        			System.exit(0);
-        		}
+        		dispose();
+        		new GUIExit(); //시스템 종료 화면으로
         	}
         });
     }
 
-    public static void main(String[] args) { // 실행 테스트를 위한 코드
+    public static void main(String[] args) { //실행 테스트를 위한 코드
         new GUIMain();
     }
 }
