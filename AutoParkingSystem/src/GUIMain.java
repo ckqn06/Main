@@ -149,25 +149,26 @@ public class GUIMain extends JFrame {
         
         clientPane.setLocation(25, 160);
         clientPane.setSize(450, 200);
-              
-        p.add(parkButton);
-        p.add(payButton);
-        p.add(searchButton);
-        p.add(adminButton);
-        p.add(quitButton);
-        p.add(clientPane);
-        p.add(clientLabel);
-        p.add(searchLabel);
-        p.add(carNumLabel);
-        p.add(placeNumLabel);
-        p.add(carNumText);
-        p.add(placeNumText);
 
         p2.add(emptyLabel);
         p2.add(whiteLabel);
         p2.add(existLabel);
         p2.add(redLabel);
         p2.add(placePane);
+        
+        p.add(clientLabel);
+        p.add(clientPane);
+        
+        p.add(searchLabel);
+        p.add(carNumLabel);
+        p.add(placeNumLabel);
+        p.add(carNumText);
+        p.add(placeNumText);      
+        p.add(parkButton);
+        p.add(payButton);
+        p.add(searchButton);
+        p.add(adminButton);
+        p.add(quitButton);
     }
 
     private void eventListner() {
