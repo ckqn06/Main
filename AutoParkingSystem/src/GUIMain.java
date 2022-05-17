@@ -51,11 +51,11 @@ public class GUIMain extends JFrame {
     	try {
         	BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
 
-        	String widthStr = br.readLine();  // 데이터 파일에서 문자열 추출
+        	String widthStr = br.readLine();  //데이터 파일에서 문자열 추출
         	String heightStr = br.readLine();
         	String payStr = br.readLine();
         	
-        	width = Integer.parseInt(widthStr.split(":")[1]); // 값 추출
+        	width = Integer.parseInt(widthStr.split(":")[1]); //값 추출
         	height = Integer.parseInt(heightStr.split(":")[1]);
         	pay = Integer.parseInt(payStr.split(":")[1]);
         
