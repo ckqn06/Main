@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import javax.swing.*;
 
 public class GUIAdminLogin extends JFrame{
@@ -16,8 +15,6 @@ public class GUIAdminLogin extends JFrame{
     
     private JButton loginButton = new JButton("로그인"); //로그인 버튼
     private JButton BackButton = new JButton("돌아가기"); // 돌아가기 버튼
-    
-    File f = new File("C://Server/관리자 데이터 파일.txt");
 
     GUIAdminLogin(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
