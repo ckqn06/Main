@@ -1,8 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-
 import javax.swing.*;
+import java.io.File;
 
 public class GUIAdminLogin extends JFrame{
 	private JPanel p = new JPanel();
@@ -18,10 +17,10 @@ public class GUIAdminLogin extends JFrame{
     private JButton loginButton = new JButton("로그인"); //로그인 버튼
     private JButton BackButton = new JButton("돌아가기"); // 돌아가기 버튼
     
-    private int op; // 실행 경로 확인 숫자
-    File f = new File("관리자 데이터 파일.txt");  // 관리자 데이터 파일
+    private int op; //실행 경로 확인 숫자
+    File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
 
-    GUIAdminLogin(int op){ //화면 기본 설정, op 1 -> 처음 로그인, op 2 -> 관리자 설정 로그인, op 3 -> 종료하기
+    GUIAdminLogin(int op){ //화면 기본 설정, op=1(첫 로그인), op=2(관리자 설정 로그인), op=3(종료하기)
     	this.op = op;
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,17 +57,16 @@ public class GUIAdminLogin extends JFrame{
         passwordText.setLocation(450, 470);
         passwordText.setFont(font);
 
-        if(op != 1) {
+        if(op != 1) { //첫 로그인이 아니라면 로그인 버튼을 오른쪽으로 이동
         	loginButton.setLocation(600, 620);
             loginButton.setSize(250, 100);
-            if(op == 3)
-            	loginButton.setText("종료하기");
-        }else {
-        	loginButton.setLocation(400, 620);
+            if(op == 3) //메인 화면에서 시스템 종료 버튼을 클릭한 경우
+            	loginButton.setText("종료하기"); //로그인이 아니라 종료하기로 텍스트를 변경
+        }else { //첫 로그인이라면 로그인 버튼을 중앙으로 이동
+        	loginButton.setLocation(400, 620); 
             loginButton.setSize(200, 100);
         }
         loginButton.setFont(font);
-        
         
         BackButton.setLocation(160, 620);
         BackButton.setSize(250, 100);
@@ -80,7 +78,8 @@ public class GUIAdminLogin extends JFrame{
         p.add(IDText);
         p.add(passwordText);
         p.add(loginButton);
-        if(op != 1)
+        
+        if(op != 1) //첫 로그인이 아니라면 돌아가기 버튼 생성
         	p.add(BackButton);
     }
 
@@ -89,7 +88,7 @@ public class GUIAdminLogin extends JFrame{
             public void actionPerformed(ActionEvent e) {
             	//ID와 비밀번호가 맞다면
             	if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) {
-            		if(op == 1) {
+            		if(op == 1) { //만약 첫 로그인이라면
             			if(f.exists()) {
                 			dispose();
                 			new GUIMain();
@@ -98,10 +97,10 @@ public class GUIAdminLogin extends JFrame{
                         	dispose();
                         	new GUIAdminSetting();
                         }
-            		}else if (op == 2) {
+            		}else if (op == 2) { //관리자 설정 로그인이라면
             			dispose();
             			new GUIAdminSetting();
-            		}else{
+            		}else{ //종료하기 화면이라면
                 		int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);
                 		if(result == JOptionPane.YES_OPTION)  //Yes를 선택할 경우
                 			System.exit(0);
@@ -122,7 +121,7 @@ public class GUIAdminLogin extends JFrame{
         });
     }
     
-    public static void main(String[] args) { // 실행 테스트를 위한 코드
-		new GUIAdminLogin(1); // 1일 경우 처음 로그인 화면으로 실행
+    public static void main(String[] args) { //실행 테스트를 위한 코드
+		new GUIAdminLogin(1); //처음 로그인 화면으로 실행
 	}
 }
