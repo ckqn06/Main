@@ -142,13 +142,13 @@ public class GUIMain extends JFrame {
         quitButton.setFont(font);
         
         placeView = new JTable(height, width);
-        placeView.setRowHeight(60);
+        placeView.setRowHeight(55);
         placeView.setTableHeader(null);
         placeView.setEnabled(false);
         
         placePane = new JScrollPane(placeView);
         placePane.setLocation(17, 130);
-        placePane.setSize(450, 580);
+        placePane.setSize(450, 440);
         placePane.getViewport().setBackground(new Color(113, 135, 190));
         placePane.setBorder(BorderFactory.createEmptyBorder());
         
