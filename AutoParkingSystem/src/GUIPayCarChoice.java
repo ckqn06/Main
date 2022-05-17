@@ -43,10 +43,10 @@ public class GUIPayCarChoice extends JFrame{
         checkButton.setSize(200, 80);
         checkButton.setFont(font);
 
-        p.add(cancleButton);
-        p.add(checkButton);
         p.add(carNumLabel);
         p.add(carNumText);
+        p.add(cancleButton);
+        p.add(checkButton);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정
