@@ -36,14 +36,6 @@ public class GUIFirst extends JFrame{
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         logoLabel.setFont(font.deriveFont(70f));
         
-        IDText.setSize(400, 100);
-        IDText.setLocation(450, 300);
-        IDText.setFont(font);
-
-        passwordText.setSize(400, 100);
-        passwordText.setLocation(450, 470);
-        passwordText.setFont(font);
-
         IDLabel.setLocation(0, 300);
         IDLabel.setSize(400, 100);
         IDLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -54,15 +46,23 @@ public class GUIFirst extends JFrame{
         passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         passwordLabel.setFont(font);
         
+        IDText.setSize(400, 100);
+        IDText.setLocation(450, 300);
+        IDText.setFont(font);
+
+        passwordText.setSize(400, 100);
+        passwordText.setLocation(450, 470);
+        passwordText.setFont(font);
+        
         loginButton.setLocation(400, 620);
         loginButton.setSize(200, 100);
         loginButton.setFont(font);
 
         p.add(logoLabel);
-        p.add(IDText);
-        p.add(passwordText);
         p.add(IDLabel);
         p.add(passwordLabel);
+        p.add(IDText);
+        p.add(passwordText);
         p.add(loginButton);
     }
 
