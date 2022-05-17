@@ -23,11 +23,11 @@ public class GUIAdminSetting extends JFrame{
     File f = new File("C://Server/관리자 데이터 파일.txt");
 
     GUIAdminSetting(){  //화면 기본 설정
-        this.setTitle("관리자 설정 화면");
+        this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
         this.eventListner();
-        this.setSize(1000,800);
+        this.setSize(1000, 800);
         this.setVisible(true);
     }
 
@@ -151,8 +151,4 @@ public class GUIAdminSetting extends JFrame{
     		}
     	});
     }
-    
-    public static void main(String[] args) { // 실행 테스트를 위한 코드
-		new GUIAdminSetting();
-	}
 }
