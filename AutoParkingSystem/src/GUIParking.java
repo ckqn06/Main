@@ -72,7 +72,7 @@ public class GUIParking extends JFrame{
         
         parkingButton.addActionListener(new ActionListener() { //주차 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	if(false) { //해당하는 위치 번호가 이미 차 있는 경우
+            	if(false) { //해당하는 위치 번호가 이미 차 있는 경우, 위치 번호가 없는 경우
                     JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
             	} else { //정상적으로 주차를 완료한 경우
             		//고객 테이블에 해당 차량을 추가시키고 메인화면에 바로 반영한다. 		
