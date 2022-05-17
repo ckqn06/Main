@@ -20,7 +20,7 @@ public class GUIAdminSetting extends JFrame{
     private JButton SettingButton = new JButton("설정 변경"); //설정 버튼
     private JButton goMainButton = new JButton("설정"); //메인 화면 버튼
     
-    File f = new File("C://Server/관리자 데이터 파일.txt");
+    File f = new File("관리자 데이터 파일.txt");
 
     GUIAdminSetting(){  //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -93,6 +93,11 @@ public class GUIAdminSetting extends JFrame{
         	p.add(SettingButton);
         } else {
         	p.add(goMainButton);
+        	try {
+        		f.createNewFile();
+        	}catch(Exception e) {
+        		System.out.println(e.getMessage());
+        	}
         }
     }
 
@@ -106,7 +111,7 @@ public class GUIAdminSetting extends JFrame{
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //범위 안의 수인지 확인
         				OutputStream os = new FileOutputStream(f);
-        				String str = ("가로 값: "+width + "\n세로 값: "+height + "\n시간 당 주차 비용: "+pay );
+        				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간 당 주차 비용:"+pay );
         				byte[] by = str.getBytes();
         				os.write(by);			
         				
@@ -117,6 +122,7 @@ public class GUIAdminSetting extends JFrame{
         				JOptionPane.showMessageDialog(null, "범위 값 안의 값을 입력해주세요");
         			}
     			} catch(Exception e1) {
+    				System.out.println(e1.getMessage());
     				JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
     			}
     		}
@@ -131,7 +137,8 @@ public class GUIAdminSetting extends JFrame{
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //범위 안의 수인지 확인
         				OutputStream os = new FileOutputStream(f);
-        				String str = ("가로 값: "+width + "\n세로 값: "+height + "\n시간 당 주차 비용: "+pay );
+        				String str = ("가로 값:" + width + "\n세로 값:" + height + "\n시간 당 주차 비용:" + pay );
+        				System.out.println(str);
         				byte[] by = str.getBytes();
         				os.write(by);
         				

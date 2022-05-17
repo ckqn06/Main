@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+
 import javax.swing.*;
 
 public class GUIAdminLogin extends JFrame{
@@ -15,8 +17,12 @@ public class GUIAdminLogin extends JFrame{
     
     private JButton loginButton = new JButton("로그인"); //로그인 버튼
     private JButton BackButton = new JButton("돌아가기"); // 돌아가기 버튼
+    
+    private int op; // 실행 경로 확인 숫자
+    File f = new File("관리자 데이터 파일.txt");  // 관리자 데이터 파일
 
-    GUIAdminLogin(){ //화면 기본 설정
+    GUIAdminLogin(int op){ //화면 기본 설정, op 1 -> 처음 로그인, op 2 -> 관리자 설정 로그인, op 3 -> 종료하기
+    	this.op = op;
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -52,9 +58,17 @@ public class GUIAdminLogin extends JFrame{
         passwordText.setLocation(450, 470);
         passwordText.setFont(font);
 
-        loginButton.setLocation(600, 620);
-        loginButton.setSize(250, 100);
+        if(op != 1) {
+        	loginButton.setLocation(600, 620);
+            loginButton.setSize(250, 100);
+            if(op == 3)
+            	loginButton.setText("종료하기");
+        }else {
+        	loginButton.setLocation(400, 620);
+            loginButton.setSize(200, 100);
+        }
         loginButton.setFont(font);
+        
         
         BackButton.setLocation(160, 620);
         BackButton.setSize(250, 100);
@@ -66,7 +80,8 @@ public class GUIAdminLogin extends JFrame{
         p.add(IDText);
         p.add(passwordText);
         p.add(loginButton);
-        p.add(BackButton);
+        if(op != 1)
+        	p.add(BackButton);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정
@@ -74,8 +89,25 @@ public class GUIAdminLogin extends JFrame{
             public void actionPerformed(ActionEvent e) {
             	//ID와 비밀번호가 맞다면
             	if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) {
-            		dispose();
-                    new GUIAdminSetting();
+            		if(op == 1) {
+            			if(f.exists()) {
+                			dispose();
+                			new GUIMain();
+                        } else {
+                        	JOptionPane.showMessageDialog(null, "현재 시스템에 관리자 데이터 파일이 존재하지 않습니다.");
+                        	dispose();
+                        	new GUIAdminSetting();
+                        }
+            		}else if (op == 2) {
+            			dispose();
+            			new GUIAdminSetting();
+            		}else{
+                		int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);
+                		if(result == JOptionPane.YES_OPTION)  //Yes를 선택할 경우
+                			System.exit(0);
+                	}
+            			
+                    
             	} else { //ID와 비밀번호가 틀리다면
             		JOptionPane.showMessageDialog(null, "관리자 ID 혹은 비밀번호가 틀렸습니다");
             	}
@@ -89,4 +121,8 @@ public class GUIAdminLogin extends JFrame{
         	}		    	             
         });
     }
+    
+    public static void main(String[] args) { // 실행 테스트를 위한 코드
+		new GUIAdminLogin(1); // 1일 경우 처음 로그인 화면으로 실행
+	}
 }

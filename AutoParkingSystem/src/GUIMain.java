@@ -30,11 +30,10 @@ public class GUIMain extends JFrame {
     
     private String[] header = {"차량번호", "주차 시간", "현재 위치", "비용"}; //고객 테이블 헤더
     private String[][] rows = {};
-    private DefaultTableModel dtm = new DefaultTableModel(8, 5);
-    private JTable placeView = new JTable(dtm); //주차 공간 테이블
+    private JTable placeView; //주차 공간 테이블
     private JTable clientTable = new JTable(rows, header); //고객 정보 테이블
 
-    private JScrollPane placePane = new JScrollPane(placeView); 
+    private JScrollPane placePane;
     private JScrollPane clientPane = new JScrollPane(clientTable);
 
     GUIMain(){
@@ -47,17 +46,22 @@ public class GUIMain extends JFrame {
     }
 
     private void formDesign() {
+    	int width = 0, height = 0, pay = 0;
+    	
     	try {
-        	BufferedReader br = new BufferedReader(new FileReader("C://Server/관리자 데이터 파일.txt"));
-        	while(true) {
-        		String line = br.readLine();
-        		if(line==null)
-        		break;
-        		System.out.println(line);
-        	}
+        	BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
+
+        	String widthStr = br.readLine();  // 데이터 파일에서 문자열 추출
+        	String heightStr = br.readLine();
+        	String payStr = br.readLine();
         	
+        	width = Integer.parseInt(widthStr.split(":")[1]); // 값 추출
+        	height = Integer.parseInt(heightStr.split(":")[1]);
+        	pay = Integer.parseInt(payStr.split(":")[1]);
+        
         	br.close();
         } catch(Exception e) {
+        	System.out.println(e.getMessage());
         	e.printStackTrace();
         }
     	
@@ -136,11 +140,15 @@ public class GUIMain extends JFrame {
         quitButton.setLocation(300, 690);
         quitButton.setSize(170, 50);
         quitButton.setFont(font);
-
+        
+        placeView = new JTable(height, width);
         placeView.setRowHeight(60);
-
+        placeView.setTableHeader(null);
+        placeView.setEnabled(false);
+        
+        placePane = new JScrollPane(placeView);
         placePane.setLocation(17, 130);
-        placePane.setSize(450, 700);
+        placePane.setSize(450, 580);
         placePane.getViewport().setBackground(new Color(113, 135, 190));
         placePane.setBorder(BorderFactory.createEmptyBorder());
         
@@ -196,14 +204,14 @@ public class GUIMain extends JFrame {
         adminButton.addActionListener(new ActionListener() { //관리자 설정 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
-        		new GUIAdminLogin(); //관리자 로그인 화면으로
+        		new GUIAdminLogin(2); //관리자 로그인 화면으로
         	}
         });
         
         quitButton.addActionListener(new ActionListener() { //시스템 종료 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
-        		new GUIExit(); //시스템 종료 화면으로
+        		new GUIAdminLogin(3); //시스템 종료 화면으로
         	}
         });
     }
