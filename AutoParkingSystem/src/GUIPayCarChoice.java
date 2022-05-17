@@ -59,7 +59,7 @@ public class GUIPayCarChoice extends JFrame{
         
         checkButton.addActionListener(new ActionListener() { //입력 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	if(false) { //해당하는 차량번호가 없을 경우
+            	if(false) { //해당하는 차량번호가 없는 경우
                     JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다"); 
             	}else {
                 	dispose();
