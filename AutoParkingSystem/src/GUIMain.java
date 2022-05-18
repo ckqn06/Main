@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 
@@ -32,6 +33,7 @@ public class GUIMain extends JFrame {
     private String[][] rows = {};
     private JTable placeView; //주차 공간 테이블
     private JTable clientTable = new JTable(rows, header); //고객 정보 테이블
+    private DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer(); //셀 가운데 정렬을 위한 요소
 
     private JScrollPane placePane;
     private JScrollPane clientPane = new JScrollPane(clientTable);
@@ -142,13 +144,23 @@ public class GUIMain extends JFrame {
         quitButton.setFont(font);
         
         placeView = new JTable(height, width);
-        placeView.setRowHeight(55);
+        placeView.setRowHeight(87);
         placeView.setTableHeader(null);
-        placeView.setEnabled(false);
+        placeView.setEnabled(false); 
+        placeView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        placeView.setFont(font);
+        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        for(int i = 0; i < width; i++) {
+        	placeView.getColumnModel().getColumn(i).setPreferredWidth(87);  //너비 설정
+        	placeView.getColumnModel().getColumn(i).setCellRenderer(dtcr); //셀 가운데 정렬
+        	for(int j = 0; j < height; j++) 
+        		placeView.setValueAt("" + (char)(65+i) + (j+1), i, j); //각 셀에 값 넣기
+        }		        
         
         placePane = new JScrollPane(placeView);
         placePane.setLocation(17, 130);
-        placePane.setSize(450, 440);
+        placePane.setSize(450, 539);
         placePane.getViewport().setBackground(new Color(113, 135, 190));
         placePane.setBorder(BorderFactory.createEmptyBorder());
         
