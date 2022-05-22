@@ -151,11 +151,12 @@ public class GUIMain extends JFrame {
         placeView.setFont(font);
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
         
-        for(int i = 0; i < width; i++) {
-        	placeView.getColumnModel().getColumn(i).setPreferredWidth(87);  //너비 설정
-        	placeView.getColumnModel().getColumn(i).setCellRenderer(dtcr); //셀 가운데 정렬
-        	for(int j = 0; j < height; j++) 
+        for(int i = 0; i < height; i++) {
+        	for(int j = 0; j < width; j++) {
+        		placeView.getColumnModel().getColumn(j).setPreferredWidth(87);  //너비 설정
+            	placeView.getColumnModel().getColumn(j).setCellRenderer(dtcr); //셀 가운데 정렬
         		placeView.setValueAt("" + (char)(65+i) + (j+1), i, j); //각 셀에 값 넣기
+        	}
         }		        
         
         placePane = new JScrollPane(placeView);
