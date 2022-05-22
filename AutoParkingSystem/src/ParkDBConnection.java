@@ -9,8 +9,8 @@ import java.text.SimpleDateFormat;
  
 public class ParkDBConnection {
     private Connection conn; //DB 커넥션 연결 객체
-    private static final String USERNAME = "root";//DBMS접속 시 아이디
-    private static final String PASSWORD = "Opensource202024**";//DBMS접속 시 비밀번호
+    private static final String USERNAME = "user";//DBMS접속 시 아이디
+    private static final String PASSWORD = "1234";//DBMS접속 시 비밀번호
     private static final String URL = "jdbc:mysql://localhost:9001/ParkDB";//DBMS접속할 db명
 
 	private Statement stmt;
@@ -40,6 +40,32 @@ public class ParkDBConnection {
     		System.out.println(e.getMessage());
     		e.getStackTrace();
     	}
+    }
+    public void data_delete(String car_number) {
+    	String Query = "DELETE FROM ParkGuest WHERE CarNumber = " + car_number;
+    	try {
+			stmt.executeUpdate(Query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+    }
+    public String[][] getTable(){ //2중 배열 테이블값을 가져오기
+    	String[][] a = new String[150][4]; //가로 4(값)와 세로 150개를 만들기
+    	String Query = "SELECT * FROM ParkGuest"; 
+    	int i = 0;
+    	try {
+			rs = stmt.executeQuery(Query); //쿼리 실행
+			while(rs.next()) {
+	    		for(int j = 0; j < 4; j++) {
+	    			a[i][j] = rs.getString(j + 1); //테이블 값 저장
+	    		}
+	    		i++;
+	    	}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+    	return a;
     }
 }
  
