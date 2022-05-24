@@ -1,13 +1,35 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.io.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 public class GUIMain extends JFrame {
     private JPanel p = new JPanel();
-    private JPanel p2 = new JPanel();
+    public JPanel p2 = new JPanel();
     
     private Font font = new Font("맑은 고딕", Font.BOLD, 25); //폰트 설정
     
@@ -31,12 +53,18 @@ public class GUIMain extends JFrame {
     
     private String[] header = {"차량번호", "주차 시간", "현재 위치", "비용"}; //고객 테이블 헤더
     private String[][] rows = {};
-    private JTable placeView; //주차 공간 테이블
-    private JTable clientTable = new JTable(rows, header); //고객 정보 테이블
+    private TableModel tableModel = new DefaultTableModel(rows, header);
+    public JTable placeView; //주차 공간 테이블
+    private JTable clientTable = new JTable(tableModel); //고객 정보 테이블
     private DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer(); //셀 가운데 정렬을 위한 요소
 
-    private JScrollPane placePane;
-    private JScrollPane clientPane = new JScrollPane(clientTable);
+    public JScrollPane placePane;
+    private JScrollPane clientPane;
+    
+    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    private UpdateClientTable uct; //고객 테이블 갱신 스레드
+    
+    private int width = 0, height = 0, pay = 0;
 
     GUIMain(){
         this.setTitle("무인 주차 관리 시스템");
@@ -45,11 +73,11 @@ public class GUIMain extends JFrame {
         this.eventListner();
         this.setSize(1000, 800);
         this.setVisible(true);
+        uct = new UpdateClientTable(this, clientTable); 
+        uct.start();
     }
 
-    private void formDesign() {
-    	int width = 0, height = 0, pay = 0;
-    	
+    public void formDesign() {
     	try {
         	BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
 
@@ -143,14 +171,30 @@ public class GUIMain extends JFrame {
         quitButton.setSize(170, 50);
         quitButton.setFont(font);
         
-        placeView = new JTable(height, width);
+        String[][] clientTableValue = dbc.getTable(); //데이터베이스에서 고객 테이블 값 가져오기
+        placeView = new JTable(height, width) {
+        	@Override
+        	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) { // 주차중인 공간 색깔 바꾸기
+        		JComponent cell = (JComponent) super.prepareRenderer(renderer, row, column);
+        		int k = 0;
+        		while(clientTableValue[k][0] != null) {
+        			if(clientTableValue[k][2].equals(placeView.getValueAt(row, column).toString())) {
+        				cell.setBackground(Color.RED);
+        				return cell;
+        			}
+        			k++;
+        		}
+        		cell.setBackground(Color.white);
+        		return cell;
+        	}
+        };
         placeView.setRowHeight(87);
         placeView.setTableHeader(null);
         placeView.setEnabled(false); 
         placeView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         placeView.setFont(font);
+        placeView.setBackground(Color.white);
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
-        
         for(int i = 0; i < height; i++) {
         	for(int j = 0; j < width; j++) {
         		placeView.getColumnModel().getColumn(j).setPreferredWidth(87);  //너비 설정
@@ -166,7 +210,16 @@ public class GUIMain extends JFrame {
         placePane.setBorder(BorderFactory.createEmptyBorder());
         
         clientTable.setRowHeight(40);
+        DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
+        int i = 0;
+        while(clientTableValue[i][0] != null) {
+        	int diffTime = diffTime(clientTableValue[i][1]);
+        	String parkTime = "" + (diffTime / 60) + "시간 " + (diffTime % 60) + "분";
+        	clientModel.addRow(new Object[]{clientTableValue[i][0], parkTime, clientTableValue[i][2], ((diffTime/15 + 1) * (pay/4))}); //테이블에 값 추가
+        	i++;
+        }
         
+        clientPane = new JScrollPane(clientTable);
         clientPane.setLocation(25, 160);
         clientPane.setSize(450, 200);
 
@@ -178,7 +231,6 @@ public class GUIMain extends JFrame {
         
         p.add(clientLabel);
         p.add(clientPane);
-        
         p.add(searchLabel);
         p.add(carNumLabel);
         p.add(placeNumLabel);
@@ -194,28 +246,50 @@ public class GUIMain extends JFrame {
     private void eventListner() {
         parkButton.addActionListener(new ActionListener() { //주차하기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		dispose();
-        		new GUIParking(); //주차하기 화면으로
+        		String[][] clientTableValue = dbc.getTable();
+        		int row = 0;
+        		while(clientTableValue[row][0] != null) //고객 테이블 행 수 확인
+        			row++;
+        		if(row == width * height) { //주차장이 가득 차 있다면
+        			JOptionPane.showMessageDialog(null, "현재 주차장이 가득 차서 주차가 불가능합니다");
+        		}else {
+        			uct.interrupt();
+        			dispose();
+            		new GUIParking(); //주차하기 화면으로
+        		}
         	}
         });
         
         payButton.addActionListener(new ActionListener() { //결제하기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
+        		uct.interrupt();
         		dispose();
-        		new GUIPayCarChoice(); //결제할 차량 번호 입력 화면으로 
+        		new GUIPayCarChoice(pay); //결제할 차량 번호 입력 화면으로 
         	}
         });
         
         searchButton.addActionListener(new ActionListener() { //검색 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		//고객 테이블의 점보와 입력창에 적힌 번호를 비교하여 맞으면 결과값을 메시지로 반환
-        		dispose();
-        		new GUISearch(); //결제할 차량 번호 입력 화면으로 
+        		String[][] clientTableValue = dbc.getTable();
+        		int i = 0;
+        		while(clientTableValue[i][0] != null) {
+        			if(clientTableValue[i][0].equals(carNumText.getText()) || clientTableValue[i][2].equals(placeNumText.getText())) { //고객 테이블의 점보와 입력창에 적힌 번호를 비교하여 맞으면 결과값을 메시지로 반환
+        				int diffTime = diffTime(clientTableValue[i][1]);
+        	        	String parkTime = "" + (diffTime / 60) + "시간 " + (diffTime % 60) + "분";
+        	        	uct.interrupt();
+        				dispose();
+                		new GUISearch(new String[]{clientTableValue[i][0], parkTime, clientTableValue[i][2], "" + ((diffTime/15 + 1) * (pay/4))}); //검색한 차량 정보 화면으로
+                		return;
+        			}
+        			i++;
+        		}
+        		JOptionPane.showMessageDialog(null, "해당 번호나 위치에 해당하는 차량이 없습니다");
         	}
         });
         
         adminButton.addActionListener(new ActionListener() { //관리자 설정 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
+        		uct.interrupt();
         		dispose();
         		new GUIAdminLogin(2); //관리자 로그인 화면으로
         	}
@@ -223,10 +297,25 @@ public class GUIMain extends JFrame {
         
         quitButton.addActionListener(new ActionListener() { //시스템 종료 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
+        		uct.interrupt();
         		dispose();
         		new GUIAdminLogin(3); //시스템 종료 화면으로
         	}
         });
+    }
+    
+    public static int diffTime(String parkTime) { // 시간 차이 계산
+    	Calendar cal = Calendar.getInstance();
+    	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //시간 포맷 설정
+    	try {
+    		Date parkDate = format.parse(parkTime); //주차시간을 Date 타입으로 전환
+    		cal.setTime(parkDate); //캘린더 시간 설정
+    		long diffTime = (System.currentTimeMillis() - cal.getTimeInMillis()) / 1000 / 60; //시간 차이를 분 단위로 계산
+    		return (int)diffTime;
+    	}catch(Exception e) { 
+    		System.out.println(e.getMessage());
+    		return -1;
+    	}
     }
 
     public static void main(String[] args) { //실행 테스트를 위한 코드

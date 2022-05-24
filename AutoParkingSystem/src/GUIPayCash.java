@@ -12,8 +12,15 @@ public class GUIPayCash extends JFrame{
     
     private JButton cancleButton = new JButton("결제 취소"); //결제 취소 버튼
     private JButton payButton = new JButton("결제하기"); //결제하기 버튼
+    
+    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    
+    private String carNum;
+    private int pay;
 
-    GUIPayCash(){ //화면 기본 설정
+    GUIPayCash(String carNum, int pay){ //화면 기본 설정
+    	this.carNum = carNum;
+    	this.pay = pay;
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -53,7 +60,7 @@ public class GUIPayCash extends JFrame{
         cancleButton.addActionListener(new ActionListener() { //결제 취소 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	new GUIPayMethodChoice(); //결제 수단 선택 화면으로
+            	new GUIPayMethodChoice(carNum, pay); //결제 수단 선택 화면으로
         	}		
         });
         
@@ -62,14 +69,14 @@ public class GUIPayCash extends JFrame{
             	try { //올바른 값이 입력되었을 경우
             		int cash = Integer.parseInt(cashText.getText()); //고객이 입력한 현금 값
             		
-                    if(true) { //현금이 충분한 경우 cash >= 내야하는 돈
-                    	if(false) { //현금이 내야하는 돈보다 많은 경우 cash > 내야하는 돈
-                    		JOptionPane.showMessageDialog(null, "거스름돈 1000원을 배출했습니다"); //거스름돈 계산
+                    if(cash >= pay) { //현금이 충분한 경우 cash >= 내야하는 돈
+                    	if(cash > pay) { //현금이 내야하는 돈보다 많은 경우 cash > 내야하는 돈
+                    		JOptionPane.showMessageDialog(null, "거스름돈 " + (cash - pay) + "원을 배출했습니다"); //거스름돈 계산
                     	}
                         	
                     	JOptionPane.showMessageDialog(null, "결제가 완료됐습니다");
                     	
-                    	// 결제한 차량과 관련된 기록 삭제
+                    	dbc.data_delete(carNum); // 결제한 차량과 관련된 기록 삭제
                     	
                     	dispose();
                     	new GUIMain();
@@ -84,6 +91,6 @@ public class GUIPayCash extends JFrame{
     }
 	
 	public static void main(String[] args) { //실행 테스트를 위한 코드
-		new GUIPayCash();
+		new GUIPayCash("1111", 10000);
 	}
 }
