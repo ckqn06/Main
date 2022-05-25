@@ -6,7 +6,7 @@ public class GUIPayMethodChoice extends JFrame{
 	private JPanel p = new JPanel();
 	private Font font = new Font("맑은 고딕", Font.BOLD, 50); //폰트 설정
 
-    private JLabel feeLabel = new JLabel("▶ 고객님은 총 15000원 만큼"); //결제해야 할 값을 적용한다.
+    private JLabel feeLabel = new JLabel(); //결제해야 할 값을 적용한다.
     private JLabel feeLabel2 = new JLabel("결제해야 합니다.");
     private JLabel choiceLabel = new JLabel("원하시는 결제 수단을 선택하십시오.");
 
@@ -14,8 +14,13 @@ public class GUIPayMethodChoice extends JFrame{
     
     private JButton cashButton = new JButton("현금으로 결제"); //현금으로 결제 버튼
     private JButton cardButton = new JButton("카드로 결제"); //카드로 결제 버튼
+    
+    private String carNum;
+    private int pay;
 
-    GUIPayMethodChoice(){ //화면 기본 설정
+    GUIPayMethodChoice(String carNum, int pay){ //화면 기본 설정
+    	this.carNum = carNum;
+    	this.pay = pay;
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -28,6 +33,7 @@ public class GUIPayMethodChoice extends JFrame{
         this.add(p);
         p.setLayout(null);
 
+        feeLabel.setText("▶ 고객님은 총 " + pay + "원 만큼");
         feeLabel.setLocation(50, 200);
         feeLabel.setSize(900, 100);
         feeLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -62,19 +68,19 @@ public class GUIPayMethodChoice extends JFrame{
     	cashButton.addActionListener(new ActionListener() { //현금으로 결제 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	new GUIPayCash(); //현금 결제 화면으로
+            	new GUIPayCash(carNum, pay); //현금 결제 화면으로
         	}		             
         });
         
     	cardButton.addActionListener(new ActionListener() { //카드로 결제 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	new GUIPayCard(); //카드 결제 화면으로
+            	new GUIPayCard(carNum, pay); //카드 결제 화면으로
         	}			             
         });
     }
 	
 	public static void main(String[] args) { //실행 테스트를 위한 코드
-		new GUIPayMethodChoice();
+		new GUIPayMethodChoice("1111", 10000);
 	}
 }

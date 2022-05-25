@@ -12,8 +12,13 @@ public class GUIPayCarChoice extends JFrame{
     
     private JButton cancleButton = new JButton("취소"); //취소 버튼
     private JButton checkButton = new JButton("입력"); //입력 버튼
+    
+    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    
+    private int pay;
 
-    GUIPayCarChoice(){ //화면 기본 설정
+    GUIPayCarChoice(int pay){ //화면 기본 설정
+    	this.pay = pay;
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -59,17 +64,22 @@ public class GUIPayCarChoice extends JFrame{
         
         checkButton.addActionListener(new ActionListener() { //입력 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	if(false) { //해당하는 차량번호가 없는 경우
-                    JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다"); 
-            	}else {
-                	dispose();
-                	new GUIPayMethodChoice(); //결제 수단 선택 화면으로
+            	String[][] clientTableValue = dbc.getTable();
+            	int i = 0;
+            	while(clientTableValue[i][0] != null) {
+            		if(clientTableValue[i][0].equals(carNumText.getText())) { //차량이 존재할 경우
+            			int diffTime = GUIMain.diffTime(clientTableValue[i][1]);
+            			dispose();
+                    	new GUIPayMethodChoice(clientTableValue[i][0], (diffTime/15 + 1) * (pay/4)); //결제 수단 선택 화면으로
+                    	return;
+            		}
             	}
+            	JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다"); //해당하는 차량번호가 없는 경우
         	}		       	             
         });
     }
 	
 	public static void main(String[] args) { //실행 테스트를 위한 코드
-		new GUIPayCarChoice();
+		new GUIPayCarChoice(10000);
 	}
 }
