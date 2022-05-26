@@ -110,7 +110,7 @@ public class GUIAdminLogin extends JFrame{
                 		if(result == JOptionPane.YES_OPTION) //Yes를 선택할 경우
                 			System.exit(0); //시스템을 종료시킴
                 	}
-            	} else { //ID와 비밀번호가 틀리다면
+            	} else { //ID 또는 비밀번호가 틀리다면
             		JOptionPane.showMessageDialog(null, "관리자 ID 혹은 비밀번호가 틀렸습니다");
             	}
         	}		 	             
