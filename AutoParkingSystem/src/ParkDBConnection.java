@@ -1,3 +1,4 @@
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -20,6 +21,7 @@ public class ParkDBConnection {
         try {
             System.out.println("생성자");
             Class.forName("com.mysql.jdbc.Driver");
+            System.out.println("success");
             conn = DriverManager.getConnection(URL, USERNAME, PASSWORD); //DB연결
             System.out.println("success");
             stmt = conn.createStatement();
@@ -34,7 +36,7 @@ public class ParkDBConnection {
     	try {
     		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //시간 포맷 설정
     		String Time = format.format(System.currentTimeMillis());
-    		String query2 = "INSERT INTO ParkGuest VALUE (\"" +car_number+ "\", \"" +Time+ "\", \"" +Park_Zone_Num+ "\", 1000)"; //쿼리문
+    		String query2 = "INSERT INTO ParkGuest VALUE (\"" +car_number+ "\", \"" +Time+ "\", \"" +Park_Zone_Num+ "\")"; //쿼리문
 			stmt.executeUpdate(query2); //쿼리 실행
     	} catch (Exception e) {
     		System.out.println(e.getMessage());
@@ -50,13 +52,13 @@ public class ParkDBConnection {
 		} 
     }
     public String[][] getTable(){ //2중 배열 테이블값을 가져오기
-    	String[][] a = new String[150][4]; //가로 4(값)와 세로 150개를 만들기
+    	String[][] a = new String[150][3]; //가로 3(값)와 세로 150개를 만들기
     	String Query = "SELECT * FROM ParkGuest"; 
     	int i = 0;
     	try {
 			rs = stmt.executeQuery(Query); //쿼리 실행
 			while(rs.next()) {
-	    		for(int j = 0; j < 4; j++) {
+	    		for(int j = 0; j <3; j++) {
 	    			a[i][j] = rs.getString(j + 1); //테이블 값 저장
 	    		}
 	    		i++;
