@@ -29,6 +29,7 @@ public class GUIAdminLogin extends JFrame{
         this.eventListner(); //이벤트를 처리함
         this.setSize(1000,800); //화면 크기 설정
         this.setVisible(true); //창을 화면에 보여줄 것임을 설정
+        setLocationRelativeTo(null); //창을 화면 가운데에 배치
     }
 
     private void formDesign() { //각 GUI 객체 설정
@@ -63,7 +64,7 @@ public class GUIAdminLogin extends JFrame{
             loginButton.setSize(250, 100);
             
             if(op == 3) //메인 화면에서 시스템 종료 버튼을 클릭한 경우
-            	loginButton.setText("종료하기"); //"로그인"이 아니라 "종료하기"로 텍스트를 변경
+            	loginButton.setText("종료하기"); //로그인 버튼의 텍스트를 "로그인"에서 "종료하기"로 변경
         
         }else { //첫 로그인이라면 로그인 버튼을 왼쪽으로 이동 (= 돌아가기 버튼이 없어짐)
         	loginButton.setLocation(400, 620); 
