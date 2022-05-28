@@ -287,10 +287,19 @@ public class GUIMain extends JFrame {
         	public void actionPerformed(ActionEvent e) {
         		String[][] clientTableValue = dbc.getTable();
         		int line = 0;
+        		boolean isExist = false; //일치하는 차가 있는지 확인하는 변수
+        		
         		
         		while(clientTableValue[line][0] != null) {
         			//고객 테이블의 행을 읽어 고객이 차량/위치 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재한다면
-        			if(clientTableValue[line][0].equals(carNumText.getText()) || clientTableValue[line][2].equals(placeNumText.getText())) {
+        			if(clientTableValue[line][0].equals(carNumText.getText()) && clientTableValue[line][2].equals(placeNumText.getText())) //차 번호와 위치가 일치할 경우
+        				isExist = true;
+        			else if(clientTableValue[line][0].equals(carNumText.getText()) && placeNumText.getText().equals("")) //차 번호가 일치하고 위치를 입력하지 않았을 경우
+        				isExist = true;
+        			else if(clientTableValue[line][2].equals(placeNumText.getText()) && carNumText.getText().equals("")) //위치가 일치하고 차번호를 입력하지 않았을 경우
+        				isExist = true;
+        			
+        			if (isExist) { //일치하는 차가 있다면
         				int diffTime = diffTime(clientTableValue[line][1]); //해당 값을 가진 차량의 주차 시간을 구함
         	        	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분";
         	        	

@@ -52,10 +52,12 @@ public class GUISearch extends JFrame {
         DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
         clientModel.addRow(clientValue); //테이블에 검색된 결과 값 추가
         
-        clientTable.setRowHeight(30);
+        clientTable.setRowHeight(55);
+        clientTable.setFont(font.deriveFont(35f));
+        clientTable.getTableHeader().setFont(font);
         clientPane = new JScrollPane(clientTable);
-        clientPane.setLocation(250, 320);
-        clientPane.setSize(450, 55);
+        clientPane.setLocation(45, 300);
+        clientPane.setSize(900, 116);
         
         dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
         TableColumnModel tcm = clientTable.getColumnModel(); //정렬할 테이블의 ColumnModel을 가져옴
