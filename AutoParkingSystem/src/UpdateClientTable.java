@@ -17,6 +17,9 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
     private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
     
     private int width, height, tpay; //가로, 세로, 시간당 주차 비용을 위한 변수
+    int VerticalScrollBarMax = 0; //가로 스크롤의 최대 크기
+    int VerticalScrollBar = 0; //세로 스크롤의 위치
+    int HorizontalScrollBar = 0; //가로 스크롤의 위치
 	
 	public UpdateClientTable(GUIMain main, JTable clientTable) {
 		this.main = main;
@@ -37,12 +40,17 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 	@Override
 	public void run() { //스레드를 실행
 		try {
-			Thread.sleep(10000); //스레드가 처음 실행되어 기능하기까지 약간의 대기 시간을 가짐
+			Thread.sleep(100); //스레드가 처음 실행되어 기능하기까지 약간의 대기 시간을 가짐
 			
 			while(!this.isInterrupted()) { //스레드가 인터럽트 걸리기 전까지 고객 테이블의 데이터를 갱신함
-				main.p2.remove(main.placePane); //메인 화면의 주차 공간 테이블에서 스크롤바를 제거함
+				if(placePane != null) {
+					main.p2.remove(placePane); //메인 화면의 주차 공간 테이블을 제거함
+					VerticalScrollBarMax = placePane.getVerticalScrollBar().getMaximum();
+					VerticalScrollBar = placePane.getVerticalScrollBar().getValue(); //현재 세로 스크롤의 위치를 가져옴
+			        HorizontalScrollBar = placePane.getHorizontalScrollBar().getValue(); //현재 가로 스크롤의 위치를 가져옴
+				}
 				String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
-		       
+		        
 				placeView = new JTable(height, width) { //주차 공간 테이블의 행과 열을 관리자 데이터 파일에 적힌 가로/세로 값만큼 생성
 		        	@Override
 		        	//셀의 색상 변경을 위해 javax.swing.JTable prepareRenderer() 메소드를 오버라이딩하여 테이블의 셀이 렌더링되도록 함
@@ -83,6 +91,9 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        placePane.setSize(450, 539);
 		        placePane.getViewport().setBackground(new Color(113, 135, 190));
 		        placePane.setBorder(BorderFactory.createEmptyBorder());
+		        placePane.getVerticalScrollBar().setMaximum(VerticalScrollBarMax);
+		        placePane.getVerticalScrollBar().setValue(VerticalScrollBar);
+		        placePane.getHorizontalScrollBar().setValue(HorizontalScrollBar);
 		        
 		        main.p2.add(placePane); //작업이 완료되면 메인 화면의 주차 공간 테이블에서 스크롤바를 다시 생성시킴
 		        
@@ -104,7 +115,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], pay*10+" 원"});
 		        	line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
 		        }
-				Thread.sleep(60000); //스레드를 다시 갱신시키기까지 1분을 대기시킴
+				Thread.sleep(2000); //스레드를 다시 갱신시키기까지 1분을 대기시킴
 			}
 		} catch(Exception e) { //인터럽트 발생시 인터럽트 발생 메시지를 출력
 			System.out.println("인터럽트 발생");

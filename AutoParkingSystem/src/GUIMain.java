@@ -36,11 +36,9 @@ public class GUIMain extends JFrame {
     private String[][] rows = {}; //고객 테이블의 열(세로 줄) 생성
     private TableModel tableModel = new DefaultTableModel(rows, header); //생성한 헤더와 열을 하나의 테이블로 정의함
     private JTable clientTable = new JTable(tableModel); //하나로 정의한 테이블로 고객 테이블을 생성
-    
-    public JTable placeView; //주차 공간 테이블 생성
+
     private DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer(); //셀 가운데 정렬을 위한 요소
 
-    public JScrollPane placePane; //주차 공간 테이블의 스크롤바 생성
     private JScrollPane clientPane; //고객 테이블의 스크롤바 생성
     
     private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
@@ -172,47 +170,6 @@ public class GUIMain extends JFrame {
         
         String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
         
-        placeView = new JTable(height, width) { //주차 공간 테이블의 행과 열을 관리자 데이터 파일에 적힌 가로/세로 값만큼 생성
-        	@Override
-        	//셀의 색상 변경을 위해 javax.swing.JTable prepareRenderer() 메소드를 오버라이딩하여 테이블의 셀이 렌더링되도록 함
-        	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-        		JComponent cell = (JComponent) super.prepareRenderer(renderer, row, column);
-        		int line = 0; //고객 테이블의 행 수를 확인하기 위한 변수 생성
-        		
-        		while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
-        			//주차 공간 테이블에 존재하는 위치 번호 중에 고객 테이블에 저장된 위치 번호와 동일한 값이 존재한다면
-        			if(clientTableValue[line][2].equals(placeView.getValueAt(row, column).toString())) {
-        				cell.setBackground(Color.RED); //해당 셀(위치 번호)의 배경을 빨간색으로 지정하여 주차된 공간임을 표시
-        				return cell; //해당 셀을 반환
-        			}
-        			line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
-        		}
-        		cell.setBackground(Color.white); //동일한 위치 번호가 없다면 해당 셀의 배경을 흰색으로 지정하여 빈 공간임을 표시 
-        		return cell;
-        	}
-        };
-        placeView.setRowHeight(87); //테이블의 열 높이 설정
-        placeView.setTableHeader(null); //테이블의 헤더를 null로 설정 (= 헤더를 없앰)
-        placeView.setEnabled(false); //셀의 클릭 기능을 비활성화함
-        placeView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); //셀의 크기 조정
-        placeView.setFont(font);
-        placeView.setBackground(Color.white); //셀의 기본 배경색은 흰색으로 지정
-        
-        dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
-        for(int i = 0; i < height; i++) { //관리자 데이터 파일에서 받아온 가로, 세로 값 만큼 반복
-        	for(int j = 0; j < width; j++) {
-        		placeView.getColumnModel().getColumn(j).setPreferredWidth(87); //셀 너비 설정
-            	placeView.getColumnModel().getColumn(j).setCellRenderer(dtcr);
-        		placeView.setValueAt("" + (char)(65+i) + (j+1), i, j); //주차 공간 테이블의 각 셀에 위치 번호를 부여함
-        	}
-        }	
-        
-        placePane = new JScrollPane(placeView);
-        placePane.setLocation(17, 130);
-        placePane.setSize(450, 539);
-        placePane.getViewport().setBackground(new Color(113, 135, 190));
-        placePane.setBorder(BorderFactory.createEmptyBorder());
-        
         clientTable.setRowHeight(30);
         //고객 테이블 내부 데이터를 다루기 위해서 DefaultTableModel을 불러옴
         DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
@@ -254,7 +211,6 @@ public class GUIMain extends JFrame {
         p2.add(whiteLabel);
         p2.add(existLabel);
         p2.add(redLabel);
-        p2.add(placePane);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정
