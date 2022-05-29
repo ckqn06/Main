@@ -1,7 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GUIAdminLogin extends JFrame{
 	private JPanel p = new JPanel(); //보조 프레임 설정
@@ -17,7 +19,8 @@ public class GUIAdminLogin extends JFrame{
     private JButton loginButton = new JButton("로그인"); //로그인 버튼
     private JButton BackButton = new JButton("돌아가기"); //돌아가기 버튼
     
-    private int op; //실행 경로 확인 숫자
+    private int op; //실행 경로 확인을 위한 변수
+    private String ID, PW; //ID, 비밀번호 확인을 위한 변수
     
     File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
 
@@ -33,6 +36,32 @@ public class GUIAdminLogin extends JFrame{
     }
 
     private void formDesign() { //각 GUI 객체 설정
+    	try {
+    		if(f.exists()) { //관리자 데이터 파일에서 텍스트를 읽어들임
+    			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
+            	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
+            	String line = null; //관리자 데이터 파일을 읽어들이기 위한 변수
+            	
+            	while((line = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
+            		list.add(line); //읽어들인 내용을 리스트에 저장
+            	}
+            	
+            	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
+            	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
+            	String IDStr = arr[3]; //배열의 4번째에 저장된 ID의 내용을 저장하기 위한 변수
+            	String PWStr = arr[4]; //배열의 5번째에 저장된 비밀번호의 내용을 저장하기 위한 변수
+            	
+            	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
+            	ID = IDStr.split(":")[1];
+            	PW = PWStr.split(":")[1];
+            	
+            	br.close(); //버퍼를 닫음
+    		}
+        } catch(Exception e) { //예외 처리
+        	System.out.println(e.getMessage());
+        	e.printStackTrace();
+        }
+    	
         this.add(p); //보조 프레임 생성
         p.setLayout(null); //보조 프레임의 레이아웃 설정
         
@@ -90,29 +119,42 @@ public class GUIAdminLogin extends JFrame{
     private void eventListner() { //버튼 클릭 이벤트 설정
         loginButton.addActionListener(new ActionListener() { //로그인 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	//ID와 비밀번호가 맞다면
-            	if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) {
-            		if(op == 1) { //만약 시스템을 실행시켜 첫 로그인을 진행하는 경우
-            			if(f.exists()) { //관리자 데이터 파일이 지정 경로에 존재한다면
-                			dispose(); //현재 보여주고 있는 창(프레임)을 닫음
+            	
+            	if(f.exists()) { //관리자 데이터 파일이 지정 경로에 존재하면서
+            		//관리자 데이터 파일에 설정된 아이디와 비밀번호가 ID/비밀번호 입력 창에 입력한 값과 동일하다면
+            		if(IDText.getText().equals(ID) && passwordText.getText().equals(PW)) {
+            			if(op == 1) { //시스템을 실행시켜 첫 로그인을 진행하는 경우
+            				dispose(); //현재 보여주고 있는 창(프레임)을 닫음
                 			new GUIMain(); //메인 화면으로 이동
-                        } else { //관리자 데이터 파일이 지정 경로에 존재하지 않는다면
-                        	JOptionPane.showMessageDialog(null, "현재 시스템에 관리자 데이터 파일이 존재하지 않습니다.");
+                		} else if(op == 2) { //관리자 설정 버튼을 통해 온 경우
+                			dispose();
+                			new GUIAdmin(); //관리자 설정 화면으로 이동
+                		} else { //종료하기 버튼을 통해 온 경우
+                			int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);
+                    		if(result == JOptionPane.YES_OPTION) //Yes를 선택할 경우
+                    			System.exit(0); //시스템을 종료시킴
+                		}
+            		} else { //ID 또는 비밀번호가 틀리다면
+            			JOptionPane.showMessageDialog(null, "관리자 ID 혹은 비밀번호가 틀렸습니다");
+            		}
+            		
+            	} else { //관리자 데이터 파일이 지정 경로에 존재하지 않으면서
+            		if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) { //Default ID와 비밀번호가 맞다면
+            			if(op == 1) {
+                			JOptionPane.showMessageDialog(null, "현재 시스템에 관리자 데이터 파일이 존재하지 않습니다.");
                         	dispose();
                         	new GUIAdminSetting(); //관리자 데이터 파일 값 변경 화면으로 이동
-                        }
-            			
-            		}else if (op == 2) { //관리자 설정 버튼을 통해 온 경우
-            			dispose();
-            			new GUIAdmin(); //관리자 설정 화면으로
-            			
-            		}else{ //종료하기 버튼을 통해 온 경우
-                		int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);
-                		if(result == JOptionPane.YES_OPTION) //Yes를 선택할 경우
-                			System.exit(0); //시스템을 종료시킴
-                	}
-            	} else { //ID 또는 비밀번호가 틀리다면
-            		JOptionPane.showMessageDialog(null, "관리자 ID 혹은 비밀번호가 틀렸습니다");
+                		} else if(op == 2) {
+                			dispose();
+                			new GUIAdmin();
+                		} else { 
+                			int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);
+                    		if(result == JOptionPane.YES_OPTION)
+                    			System.exit(0);
+                		}
+            		} else {
+            			JOptionPane.showMessageDialog(null, "관리자 ID 혹은 비밀번호가 틀렸습니다");
+            		}
             	}
         	}		 	             
         });

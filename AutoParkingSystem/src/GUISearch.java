@@ -86,15 +86,14 @@ public class GUISearch extends JFrame {
         	public void actionPerformed(ActionEvent e) {
         		int result = JOptionPane.showConfirmDialog(null, "해당 차량으로 결제를 진행하시겠습니까?", "결제 진행", JOptionPane.YES_NO_OPTION);
         		if(result == JOptionPane.YES_OPTION) { //Yes를 선택할 경우
+        			String carNum = clientValue[0]; //결과 테이블에 저장된 차량 번호를 저장하는 변수
+        			String won = clientValue[3].replace(" 원", ""); //결과 테이블에 저장된 주차 비용에서 "원"을 제외한 값을 저장하는 변수
+        			int pay = Integer.parseInt(won); //추출한 주차 비용 값을 int형으로 변환
+        			
         			dispose();
-        			new GUIMain();
-                	//new GUIPayMethodChoice(); //결제 수단 화면으로 이동
+        			new GUIPayMethodChoice(carNum, pay); //결과 테이블에 저장된 차량 번호와 주차 비용과 함께 결제 수단 화면으로 이동
         		}
         	}
         });
-    }
-    
-    public static void main(String[] args) { //실행 테스트를 위한 코드
-        new GUISearch(new String[]{"1111", "2003-12-04 12:22:34", "A1", "10000"});
     }
 }

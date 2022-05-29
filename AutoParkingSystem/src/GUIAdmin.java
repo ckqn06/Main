@@ -3,8 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class GUIAdmin extends JFrame{
 	private JPanel p = new JPanel();
@@ -85,7 +84,7 @@ public class GUIAdmin extends JFrame{
 		changeButton.addActionListener(new ActionListener() { //관리자 계정 ID/PW 변경 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
-        		new GUIMain(); //메인 화면으로 이동
+        		new GUIChangeLogin(); //관리자 계정 ID/PW 변경 화면으로 이동
         	}
         });
 		

@@ -36,7 +36,7 @@ public class GUIMain extends JFrame {
     private String[][] rows = {}; //고객 테이블의 열(세로 줄) 생성
     private TableModel tableModel = new DefaultTableModel(rows, header); //생성한 헤더와 열을 하나의 테이블로 정의함
     private JTable clientTable = new JTable(tableModel); //하나로 정의한 테이블로 고객 테이블을 생성
-
+    
     private DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer(); //셀 가운데 정렬을 위한 요소
 
     private JScrollPane clientPane; //고객 테이블의 스크롤바 생성
@@ -187,6 +187,7 @@ public class GUIMain extends JFrame {
         
         TableColumnModel tcm = clientTable.getColumnModel(); //정렬할 테이블의 ColumnModel을 가져옴
         
+        dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
         for (int i = 0; i < tcm.getColumnCount(); i++) { //테이블의 셀을 가운데 정렬함
         	tcm.getColumn(i).setCellRenderer(dtcr); 
         } 

@@ -43,14 +43,15 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 			Thread.sleep(100); //스레드가 처음 실행되어 기능하기까지 약간의 대기 시간을 가짐
 			
 			while(!this.isInterrupted()) { //스레드가 인터럽트 걸리기 전까지 고객 테이블의 데이터를 갱신함
-				if(placePane != null) {
-					main.p2.remove(placePane); //메인 화면의 주차 공간 테이블을 제거함
+				if(placePane != null) { //메인 화면의 주차 공간 테이블에서 스크롤이 존재한다면
+					main.p2.remove(placePane); //메인 화면의 주차 공간 테이블에서 스크롤바를 제거함
 					VerticalScrollBarMax = placePane.getVerticalScrollBar().getMaximum();
 					VerticalScrollBar = placePane.getVerticalScrollBar().getValue(); //현재 세로 스크롤의 위치를 가져옴
 			        HorizontalScrollBar = placePane.getHorizontalScrollBar().getValue(); //현재 가로 스크롤의 위치를 가져옴
 				}
+				
 				String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
-		        
+		       
 				placeView = new JTable(height, width) { //주차 공간 테이블의 행과 열을 관리자 데이터 파일에 적힌 가로/세로 값만큼 생성
 		        	@Override
 		        	//셀의 색상 변경을 위해 javax.swing.JTable prepareRenderer() 메소드를 오버라이딩하여 테이블의 셀이 렌더링되도록 함
@@ -76,8 +77,8 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        placeView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); //셀의 크기 조정
 		        placeView.setFont(font);
 		        placeView.setBackground(Color.white); //셀의 기본 배경색은 흰색으로 지정
-		        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
 		        
+		        dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
 		        for(int i=0; i<height; i++) { //관리자 데이터 파일에서 받아온 가로, 세로 값 만큼 반복
 		        	for(int j=0; j<width; j++) {
 		        		placeView.getColumnModel().getColumn(j).setPreferredWidth(87); //셀 너비 설정
@@ -115,7 +116,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], pay*10+" 원"});
 		        	line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
 		        }
-				Thread.sleep(2000); //스레드를 다시 갱신시키기까지 1분을 대기시킴
+				Thread.sleep(2000); //스레드를 다시 갱신시키기까지 2초를 대기시킴
 			}
 		} catch(Exception e) { //인터럽트 발생시 인터럽트 발생 메시지를 출력
 			System.out.println("인터럽트 발생");
