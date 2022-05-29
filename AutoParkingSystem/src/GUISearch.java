@@ -1,10 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
+import javax.swing.table.*;
 
 public class GUISearch extends JFrame {
     private JPanel p = new JPanel();
@@ -12,7 +9,8 @@ public class GUISearch extends JFrame {
     
     private JLabel label = new JLabel("▶ 검색하신 차량의 정보입니다."); //화면에 보여주는 메시지
     
-    private JButton Button = new JButton("확인"); //확인 버튼
+    private JButton backButton = new JButton("돌아가기"); //돌아가기 버튼
+    private JButton payButton = new JButton("결제하기"); //결제하기 버튼
     
     private String[] header = {"차량번호", "주차 시간", "현재 위치", "비용"}; //고객 테이블의 헤더 생성
     private String[][] rows = {}; //고객 테이블의 열(세로 줄) 생성
@@ -39,25 +37,29 @@ public class GUISearch extends JFrame {
     	this.add(p);
         p.setLayout(null);
         
-        label.setLocation(30, 150);
+        label.setLocation(30, 180);
         label.setSize(900, 100);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setFont(font);
         
-        Button.setLocation(370, 620);
-        Button.setSize(200, 80);
-        Button.setFont(font);
+        backButton.setLocation(160, 620);
+        backButton.setSize(250, 80);
+        backButton.setFont(font);
+        
+        payButton.setLocation(580, 620);
+        payButton.setSize(250, 80);
+        payButton.setFont(font);
         
         //고객 테이블 내부 데이터를 다루기 위해서 DefaultTableModel을 불러옴
         DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
         clientModel.addRow(clientValue); //테이블에 검색된 결과 값 추가
         
         clientTable.setRowHeight(55);
-        clientTable.setFont(font.deriveFont(35f));
-        clientTable.getTableHeader().setFont(font);
+        clientTable.getTableHeader().setFont(new Font("고딕", Font.PLAIN, 30));
+        clientTable.setFont(new Font("고딕", Font.PLAIN, 30));
         clientPane = new JScrollPane(clientTable);
-        clientPane.setLocation(45, 300);
-        clientPane.setSize(900, 116);
+        clientPane.setLocation(45, 320);
+        clientPane.setSize(900, 104);
         
         dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
         TableColumnModel tcm = clientTable.getColumnModel(); //정렬할 테이블의 ColumnModel을 가져옴
@@ -67,16 +69,32 @@ public class GUISearch extends JFrame {
         } 
 
         p.add(label);
-        p.add(Button);
+        p.add(backButton);
+        p.add(payButton);
         p.add(clientPane);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정
-        Button.addActionListener(new ActionListener() { //확인 버튼 클릭 시 실행
+    	backButton.addActionListener(new ActionListener() { //돌아가기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
         		new GUIMain(); //메인 화면으로 이동
         	}
         });
+    	
+    	payButton.addActionListener(new ActionListener() { //결제하기 버튼 클릭 시 실행
+        	public void actionPerformed(ActionEvent e) {
+        		int result = JOptionPane.showConfirmDialog(null, "해당 차량으로 결제를 진행하시겠습니까?", "결제 진행", JOptionPane.YES_NO_OPTION);
+        		if(result == JOptionPane.YES_OPTION) { //Yes를 선택할 경우
+        			dispose();
+        			new GUIMain();
+                	//new GUIPayMethodChoice(); //결제 수단 화면으로 이동
+        		}
+        	}
+        });
+    }
+    
+    public static void main(String[] args) { //실행 테스트를 위한 코드
+        new GUISearch(new String[]{"1111", "2003-12-04 12:22:34", "A1", "10000"});
     }
 }

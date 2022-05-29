@@ -99,12 +99,12 @@ public class GUIAdminLogin extends JFrame{
                         } else { //관리자 데이터 파일이 지정 경로에 존재하지 않는다면
                         	JOptionPane.showMessageDialog(null, "현재 시스템에 관리자 데이터 파일이 존재하지 않습니다.");
                         	dispose();
-                        	new GUIAdminSetting(); //관리자 설정 화면으로 이동
+                        	new GUIAdminSetting(); //관리자 데이터 파일 값 변경 화면으로 이동
                         }
             			
             		}else if (op == 2) { //관리자 설정 버튼을 통해 온 경우
             			dispose();
-            			new GUIAdminSetting();
+            			new GUIAdmin(); //관리자 설정 화면으로
             			
             		}else{ //종료하기 버튼을 통해 온 경우
                 		int result = JOptionPane.showConfirmDialog(null, "정말로 시스템을 종료하시겠습니까?", "시스템 종료", JOptionPane.YES_NO_OPTION);

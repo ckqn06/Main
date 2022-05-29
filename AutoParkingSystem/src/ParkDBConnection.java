@@ -5,7 +5,7 @@ public class ParkDBConnection {
     private Connection conn; //DB 커넥션 연결 객체
     private static final String USERNAME = "user"; //DBMS(데이터베이스 관리 시스템)에 접속하기 위한 아이디
     private static final String PASSWORD = "1234"; //DBMS(데이터베이스 관리 시스템)에 접속하기 위한 비밀번호
-    private static final String URL = "jdbc:mysql://localhost:3306/ParkDB"; //JDBC 드라이버 주소
+    private static final String URL = "jdbc:mysql://localhost:3306/ParkDB?useUnicode=true&characterEncoding=utf8"; //JDBC 드라이버 주소
 
 	private Statement stmt; //쿼리 작업을 실행하기 위한 객체
 	private ResultSet rs; //쿼리를 실행한 결과값을 저장하는 객체
@@ -40,7 +40,7 @@ public class ParkDBConnection {
     
     public void data_delete(String car_number) { //DB파일 내에 저장된 고객 정보를 삭제하기 위한 메소드
     	//ParkDB DB파일 내의 ParkGuest 테이블에 차량 번호 데이터를 삭제함
-    	String Query = "DELETE FROM ParkGuest WHERE CarNumber = " + car_number;
+    	String Query = "DELETE FROM ParkGuest WHERE CarNumber = " + "'" + car_number + "'";
     	try {
 			stmt.executeUpdate(Query);
 		} catch (SQLException e) { //삭제가 정상적으로 처리되지 않는다면 예외 처리

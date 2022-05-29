@@ -16,7 +16,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 	
     private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
     
-    private int width, height, pay; //가로, 세로, 시간당 주차 비용 값을 0으로 초기화
+    private int width, height, tpay; //가로, 세로, 시간당 주차 비용을 위한 변수
 	
 	public UpdateClientTable(GUIMain main, JTable clientTable) {
 		this.main = main;
@@ -30,7 +30,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 	    	
 	    	width = Integer.parseInt(widthStr.split(":")[1]); //값 추출
 	    	height = Integer.parseInt(heightStr.split(":")[1]);
-	    	pay = Integer.parseInt(payStr.split(":")[1]);
+	    	tpay = Integer.parseInt(payStr.split(":")[1]);
 		}catch(Exception e) {}
 	}
 	
@@ -98,9 +98,10 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 				
 				while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
 					int diffTime = GUIMain.diffTime(clientTableValue[line][1]); //고객 테이블의 2번째 열에 주차 시간을 저장시킴
+					int pay = ((diffTime/15 + 1) * (tpay/4))/10; //주차 시간을 통해 주차 비용 계산
 		        	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분"; //계산한 주차 시간(분 단위)을 시간, 분으로 표시
 		        	//고객 테이블의 열에 차량 번호, 주차 시간, 위치 번호, 시간당 주차 비용을 추가
-		        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], ((diffTime/15 + 1) * (pay/4)) + " 원"});
+		        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], pay*10+" 원"});
 		        	line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
 		        }
 				Thread.sleep(60000); //스레드를 다시 갱신시키기까지 1분을 대기시킴

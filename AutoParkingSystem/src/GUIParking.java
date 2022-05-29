@@ -10,6 +10,7 @@ public class GUIParking extends JFrame{
 
 	//화면에 보여주는 메시지 설정
     private JLabel carNumLabel = new JLabel("▶ 주차할 차량 번호를 입력하십시오.");
+    private JLabel exampleLabel = new JLabel("(예시. 12가3456)");
     private JLabel placeLabel = new JLabel("▶ 주차할 위치 번호를 입력하십시오.");
 
     private JTextField carNumText = new JTextField(); //차량 번호 입력 창
@@ -32,10 +33,15 @@ public class GUIParking extends JFrame{
         this.add(p);
         p.setLayout(null);
 
-        carNumLabel.setLocation(40, 120);
+        carNumLabel.setLocation(40, 80);
         carNumLabel.setSize(900, 100);
         carNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
         carNumLabel.setFont(font);
+        
+        exampleLabel.setLocation(215, 135);
+        exampleLabel.setSize(900, 100);
+        exampleLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        exampleLabel.setFont(new Font("고딕", Font.PLAIN, 30));
         
         placeLabel.setLocation(40, 360);
         placeLabel.setSize(900, 100);
@@ -59,6 +65,7 @@ public class GUIParking extends JFrame{
         parkingButton.setFont(font);
 
         p.add(carNumLabel);
+        p.add(exampleLabel);
         p.add(placeLabel);
         p.add(carNumText);
         p.add(placeText);
@@ -117,11 +124,18 @@ public class GUIParking extends JFrame{
         	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
         	int width = Integer.parseInt(widthStr.split(":")[1]);
         	int height = Integer.parseInt(heightStr.split(":")[1]);
-        	
-    		Integer.parseInt(carNumText.getText()); //차량 번호 입력 창에서 입력받은 값을 정수로 받아옴
     		
-    		if(carNumText.getText().length() != 4) //차량 번호 입력 창에서 입력받은 값이 네 자리가 아니라면
-        		return false; //올바르지 않은 값으로 인식하여 false 반환
+        	String str = carNumText.getText();
+        	System.out.println(carNumText.getText());
+        	char check = str.charAt(2);
+        	System.out.println(check);
+        	
+    		if(carNumText.getText().length() != 7) //차량 번호 입력 창에서 입력받은 값이 7자리가 아니면
+    			return false; //올바르지 않은 값으로 인식하여 false 반환
+    		
+    		//차량 번호 입력 창에서 입력받은 값이 7자리지만, 3번째 자리가 숫자라면
+    		if(carNumText.getText().length() == 7 && check >= 48 && check <= 57)
+    			return false;
     		
     		//위치 번호 입력 창에서 입력받은 값의 첫 번째 자리가 알파벳(대문자)이며, 주차 공간 테이블의 세로 값 안에 있으며
     		if((place.charAt(0) >= 65 && place.charAt(0) < 65 + height)) { 

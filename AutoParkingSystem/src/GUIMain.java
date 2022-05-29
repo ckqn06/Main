@@ -46,7 +46,7 @@ public class GUIMain extends JFrame {
     private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
     private UpdateClientTable uct; //고객 테이블의 데이터 갱신을 위한 스레드
     
-    private int width = 0, height = 0, pay = 0; //가로, 세로, 시간당 주차 비용 값을 0으로 초기화
+    private int width, height, tpay = 0; //가로, 세로, 시간당 주차 비용 값을 0으로 초기화
 
     GUIMain(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -86,7 +86,7 @@ public class GUIMain extends JFrame {
         	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
         	width = Integer.parseInt(widthStr.split(":")[1]);
         	height = Integer.parseInt(heightStr.split(":")[1]);
-        	pay = Integer.parseInt(payStr.split(":")[1]);
+        	tpay = Integer.parseInt(payStr.split(":")[1]);
         
         	br.close(); //버퍼를 닫음
         } catch(Exception e) { //예외 처리
@@ -220,9 +220,11 @@ public class GUIMain extends JFrame {
         
         while(clientTableValue[line][0] != null) {
         	int diffTime = diffTime(clientTableValue[line][1]); //고객 테이블의 2번째 열에 주차 시간을 저장시킴
+        	int pay = ((diffTime/15 + 1) * (tpay/4))/10; //주차 시간을 통해 주차 비용 계산
         	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분"; //계산한 주차 시간(분 단위)을 시간, 분으로 표시
-        	//고객 테이블의 열에 차량 번호, 주차 시간, 위치 번호, 시간당 주차 비용을 추가
-        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], ((diffTime/15 + 1) * (pay/4)) + " 원"});
+        	
+        	//고객 테이블의 열에 차량 번호, 주차 시간, 위치 번호, 주차 비용을 추가
+        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], pay*10+" 원"});
         	line++;
         }
         
@@ -279,7 +281,7 @@ public class GUIMain extends JFrame {
         	public void actionPerformed(ActionEvent e) {
         		uct.interrupt();
         		dispose();
-        		new GUIPayCarChoice(pay); //결제하기 화면으로 이동
+        		new GUIPayCarChoice(tpay); //결제하기 화면으로 이동
         	}
         });
         
@@ -289,43 +291,36 @@ public class GUIMain extends JFrame {
         		int line = 0;
         		boolean isExist = false; //일치하는 차가 있는지 확인하는 변수
         		
-        		
         		while(clientTableValue[line][0] != null) {
-        			//고객 테이블의 행을 읽어 고객이 차량/위치 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재한다면
-        			if(clientTableValue[line][0].equals(carNumText.getText()) && clientTableValue[line][2].equals(placeNumText.getText())) //차 번호와 위치가 일치할 경우
-        				isExist = true;
-        			else if(clientTableValue[line][0].equals(carNumText.getText()) && placeNumText.getText().equals("")) //차 번호가 일치하고 위치를 입력하지 않았을 경우
-        				isExist = true;
-        			else if(clientTableValue[line][2].equals(placeNumText.getText()) && carNumText.getText().equals("")) //위치가 일치하고 차번호를 입력하지 않았을 경우
-        				isExist = true;
+        			if(clientTableValue[line][0].equals(carNumText.getText()) && clientTableValue[line][2].equals(placeNumText.getText()))
+        				isExist = true; //고객 테이블의 행을 읽어 고객이 차량/위치 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재한다면
+        			else if(clientTableValue[line][0].equals(carNumText.getText()) && placeNumText.getText().equals(""))
+        				isExist = true; //차량 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재하지만 위치 번호는 없다면
+        			else if(clientTableValue[line][2].equals(placeNumText.getText()) && carNumText.getText().equals(""))
+        				isExist = true; //위치 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재하지만 차량 번호는 없다면
         			
-        			if (isExist) { //일치하는 차가 있다면
+        			if (isExist) { //고객이 차량/위치 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재한다면
         				int diffTime = diffTime(clientTableValue[line][1]); //해당 값을 가진 차량의 주차 시간을 구함
+        				int pay = ((diffTime/15 + 1) * (tpay/4))/10;
         	        	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분";
         	        	
         	        	uct.interrupt();
         				dispose();
-        				//검색한 차량의 차량번호, 주차 시간, 현재 위치, 시간당 주차 비용 값과 함께 검색 결과 화면으로 이동
-                		new GUISearch(new String[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], "" + ((diffTime/15 + 1) * (pay/4)) + " 원"});
+        				//검색한 차량의 차량번호, 주차 시간, 현재 위치, 주차 비용 값과 함께 검색 결과 화면으로 이동
+                		new GUISearch(new String[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], ""+pay*10+" 원"});
                 		return;
         			}
         			line++;
         		}
-        		JOptionPane.showMessageDialog(null, "해당 번호나 위치에 해당하는 차량이 없습니다");
+        		JOptionPane.showMessageDialog(null, "해당 차량 혹은 위치 번호에 해당하는 차량이 없습니다"); //고객 테이블에 동일한 값이 존재하지 않는다면
         	}
         });
         
         adminButton.addActionListener(new ActionListener() { //관리자 설정 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
-        		
-        		if(clientTableValue[0][0] == null) { //고객 테이블 내에 고객이 존재하지 않는다면
-        			uct.interrupt();
-            		dispose();
-            		new GUIAdminLogin(2); //관리자 로그인 화면으로 이동
-    			} else {
-    				JOptionPane.showMessageDialog(null, "현재 고객이 존재하여 설정 변경이 불가능합니다");
-    			}
+        		uct.interrupt();
+        		dispose();
+        		new GUIAdminLogin(2); //관리자 로그인 화면으로 이동
         	}
         });
         
