@@ -77,12 +77,10 @@ public class GUIPayCarChoice extends JFrame{
                     	new GUIPayMethodChoice(clientTableValue[line][0], (diffTime/15 + 1) * (pay/4));
                     	return;
             		}
-            		
-            		else { //고객 테이블에 저장된 차량 번호 중 차량 번호 입력 창에서 입력한 값과 동일한 값이 존재하지 않는다면 
-            			JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다");
-            			return;
-            		}
+            		line++;
             	}
+            	JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다");
+    			return;
         	}		       	             
         });
     }
