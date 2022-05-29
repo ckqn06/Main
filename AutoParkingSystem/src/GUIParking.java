@@ -126,9 +126,7 @@ public class GUIParking extends JFrame{
         	int height = Integer.parseInt(heightStr.split(":")[1]);
     		
         	String str = carNumText.getText();
-        	System.out.println(carNumText.getText());
         	char check = str.charAt(2);
-        	System.out.println(check);
         	
     		if(carNumText.getText().length() != 7) //차량 번호 입력 창에서 입력받은 값이 7자리가 아니면
     			return false; //올바르지 않은 값으로 인식하여 false 반환

@@ -74,10 +74,10 @@ public class GUIAdmin extends JFrame{
         	}
         });
 		
-		restrictButton.addActionListener(new ActionListener() { //주차 제한 구역 설정 버튼 클릭 시 실행
+		restrictButton.addActionListener(new ActionListener() { //특수 주차 공간 설정 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
-        		new GUIMain(); //메인 화면으로 이동
+        		new GUIRestrict(); //특수 주차 공간 설정 화면으로 이동
         	}
         });
 		

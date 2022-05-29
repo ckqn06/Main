@@ -14,10 +14,14 @@ public class GUIMain extends JFrame {
     private Font font = new Font("맑은 고딕", Font.BOLD, 25); //폰트 설정
     
     //화면에 보여주는 메시지 설정
-    private JLabel emptyLabel = new JLabel("= 빈 공간");
+    private JLabel emptyLabel = new JLabel(": 빈 공간");
     private JLabel whiteLabel = new JLabel("흰색");
-    private JLabel existLabel = new JLabel("= 찬 공간");
+    private JLabel existLabel = new JLabel(": 찬 공간");
     private JLabel redLabel = new JLabel("빨간색");
+    private JLabel handicapLabel = new JLabel(": 장애인 전용");
+    private JLabel greenLabel = new JLabel("초록색");
+    private JLabel noParkLabel = new JLabel(": 주차 불가");
+    private JLabel blackLabel = new JLabel("검은색");
     private JLabel clientLabel = new JLabel("-현재 이용 중인 고객");
     private JLabel searchLabel = new JLabel("-차량 데이터 검색");
     private JLabel carNumLabel = new JLabel("차량 번호로 검색:");
@@ -102,27 +106,49 @@ public class GUIMain extends JFrame {
         p2.setBackground(new Color(113, 135, 190)); //배경색을 파란색으로 설정
         p2.setPreferredSize(new Dimension(500, 800));
         
-        emptyLabel.setLocation(330, 20);
+        emptyLabel.setLocation(100, 20);
         emptyLabel.setSize(400, 100);
         emptyLabel.setVerticalAlignment(SwingConstants.TOP);
-        emptyLabel.setFont(new Font("맑은 고딕", Font.BOLD, 30));
+        emptyLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
 
-        whiteLabel.setLocation(260, 20);
+        whiteLabel.setLocation(40, 20);
         whiteLabel.setSize(400, 100);
         whiteLabel.setVerticalAlignment(SwingConstants.TOP);
-        whiteLabel.setFont(new Font("맑은 고딕", Font.BOLD, 30));
+        whiteLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
         whiteLabel.setForeground(Color.white); //텍스트의 색상을 설정
 
-        existLabel.setLocation(330, 60);
+        existLabel.setLocation(100, 60);
         existLabel.setSize(400, 100);
         existLabel.setVerticalAlignment(SwingConstants.TOP);
-        existLabel.setFont(new Font("맑은 고딕", Font.BOLD, 30));
+        existLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
 
-        redLabel.setLocation(230, 60);
+        redLabel.setLocation(15, 60);
         redLabel.setSize(400, 100);
         redLabel.setVerticalAlignment(SwingConstants.TOP);
-        redLabel.setFont(new Font("맑은 고딕", Font.BOLD, 30));
+        redLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
         redLabel.setForeground(Color.red);
+        
+        handicapLabel.setLocation(305, 20);
+        handicapLabel.setSize(400, 100);
+        handicapLabel.setVerticalAlignment(SwingConstants.TOP);
+        handicapLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
+
+        greenLabel.setLocation(220, 20);
+        greenLabel.setSize(400, 100);
+        greenLabel.setVerticalAlignment(SwingConstants.TOP);
+        greenLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
+        greenLabel.setForeground(Color.green);
+        
+        noParkLabel.setLocation(330, 60);
+        noParkLabel.setSize(400, 100);
+        noParkLabel.setVerticalAlignment(SwingConstants.TOP);
+        noParkLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
+
+        blackLabel.setLocation(245, 60);
+        blackLabel.setSize(400, 100);
+        blackLabel.setVerticalAlignment(SwingConstants.TOP);
+        blackLabel.setFont(new Font("맑은 고딕", Font.BOLD, 27));
+        blackLabel.setForeground(Color.black);
         
         clientLabel.setLocation(30, 80);
         clientLabel.setSize(400, 100);
@@ -212,6 +238,10 @@ public class GUIMain extends JFrame {
         p2.add(whiteLabel);
         p2.add(existLabel);
         p2.add(redLabel);
+        p2.add(handicapLabel);
+        p2.add(greenLabel);
+        p2.add(noParkLabel);
+        p2.add(blackLabel);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정
