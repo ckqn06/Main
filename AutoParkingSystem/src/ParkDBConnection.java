@@ -5,7 +5,7 @@ public class ParkDBConnection {
     private Connection conn; //DB 커넥션 연결 객체
     private static final String USERNAME = "user"; //DBMS(데이터베이스 관리 시스템)에 접속하기 위한 아이디
     private static final String PASSWORD = "1234"; //DBMS(데이터베이스 관리 시스템)에 접속하기 위한 비밀번호
-    private static final String URL = "jdbc:mysql://localhost:3306/ParkDB?useUnicode=true&characterEncoding=utf8"; //JDBC 드라이버 주소
+    private static final String URL = "jdbc:mysql://localhost:9001/ParkDB?useUnicode=true&characterEncoding=utf8"; //JDBC 드라이버 주소
 
 	private Statement stmt; //쿼리 작업을 실행하기 위한 객체
 	private ResultSet rs; //쿼리를 실행한 결과값을 저장하는 객체
