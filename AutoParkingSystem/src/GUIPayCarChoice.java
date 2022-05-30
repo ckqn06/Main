@@ -65,12 +65,9 @@ public class GUIPayCarChoice extends JFrame{
         checkButton.addActionListener(new ActionListener() { //입력 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
             	String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
-            	int line = 0; //고객 테이블의 행 수를 확인하기 위한 변수 생성
             	
-            	while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
+            	for(int line = 0; line < clientTableValue.length; line++) {
             		//고객 테이블에 존재하는 차량 번호 중에 차량 번호 입력 창에서 입력한 값과 동일한 값이 존재한다면
-            		System.out.println(clientTableValue[line][0]);
-            		
             		if(clientTableValue[line][0].equals(carNumText.getText())) {
             			int diffTime = GUIMain.diffTime(clientTableValue[line][1]); //해당 값을 가진 차량의 주차 시간을 구함
             			int pay = ((diffTime/15 + 1) * (tpay/4))/10;
@@ -80,8 +77,8 @@ public class GUIPayCarChoice extends JFrame{
                     	new GUIPayMethodChoice(clientTableValue[line][0], pay*10);
                     	return;
             		} 
-            		line++; //고객 테이블에 저장된 차량 번호 중 차량 번호 입력 창에서 입력한 값과 동일한 값이 존재하지 않는다면 다음 행을 탐색
             	}
+            	
             	JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다");
             	return;
         	}		       	             

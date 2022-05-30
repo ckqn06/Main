@@ -23,7 +23,7 @@ public class GUIAdminSetting extends JFrame{
     private JButton SettingButton = new JButton("설정 변경"); //설정 버튼
     private JButton CancleButton = new JButton("취소"); //취소 버튼
     
-    private String ID, PW, handicap, noPark; //관리자 ID, 비밀번호, 장애인/주차 불가 구역 번호를 저장하는 변수
+    private String ID, PW; //관리자 ID, 비밀번호를 저장하는 변수
     
     File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
 
@@ -54,14 +54,10 @@ public class GUIAdminSetting extends JFrame{
             	//배열의 n번째에 저장된 관리자 ID, 비밀번호, 장애인/주차 불가 구역 번호의 내용을 저장하기 위한 변수
             	String IDStr = arr[3];
             	String PWStr = arr[4];
-            	String handicapStr = arr[5];
-            	String noParkStr = arr[6];
             	
             	//배열에 저장된 텍스트를 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
             	ID = IDStr.split(":")[1];
             	PW = PWStr.split(":")[1];
-            	handicap = handicapStr.split(":")[1];
-            	noPark = noParkStr.split(":")[1];
 
     			br.close(); //버퍼를 닫음
     		}
@@ -146,8 +142,6 @@ public class GUIAdminSetting extends JFrame{
     				int width = Integer.parseInt(widthText.getText()); //가로 입력 창에서 입력받은 값을 정수로 받아옴
         			int height = Integer.parseInt(heightText.getText()); //세로 입력 창에서 입력받은 값을 정수로 받아옴
         			int pay = Integer.parseInt(payText.getText()); //시간당 주차 비용 입력 창에서 입력받은 값을 정수로 받아옴
-        			ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
-        			String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //가로, 세로 값이 범위 내의 값이며
         				if(f.exists()) { //관리자 데이터 파일이 존재한다면
@@ -155,7 +149,7 @@ public class GUIAdminSetting extends JFrame{
         					
             				//파일에 가로/세로 값, 시간당 주차 비용 값을 적어놓음
         					String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID
-    						+ "\nPW:"+PW + "\n장애인 전용 주차 구역:"+handicap + "\n주차 불가 구역:"+noPark);
+    						+ "\nPW:"+PW + "\n장애인 전용 주차 구역:0\n주차 불가 구역:0"); //설정 변경 시 오류 방지를 위해 장애인 전용 주차 구역과 주차 불가 구역 값 초기화
                 			byte[] by = str.getBytes();
                 			os.write(by);
                 				

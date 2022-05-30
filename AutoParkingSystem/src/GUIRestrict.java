@@ -23,7 +23,7 @@ public class GUIRestrict extends JFrame{
     
     private String width, height, pay, ID, PW; //가로, 세로, 관리자 ID, 비밀번호를 저장하는 변수
     
-    File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
+    private File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
 
     GUIRestrict(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -33,6 +33,18 @@ public class GUIRestrict extends JFrame{
         this.setSize(1000, 800);
         this.setVisible(true);
         setLocationRelativeTo(null);
+    }
+    
+    private boolean isExist(String[] place) {
+    	ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
+    	
+    	for(int line = 0; line < clientTableValue.length; line++) 
+    		for(int i = 0; i < place.length; i++) 
+        		if(clientTableValue[line][2].equals(place[i])) //입력한 위치 값과 동일한 번호가 고객 테이블에 존재한다면
+                    return true;
+    	
+    	return false;
     }
 
     private void formDesign() { //각 GUI 객체 설정
@@ -125,38 +137,44 @@ public class GUIRestrict extends JFrame{
     			try {
     				ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
                 	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
-                	int line = 0; //고객 테이블의 행 수를 확인하기 위한 변수 생성
+                	String[] handicaps = handicapText.getText().split(",");
+                	String[] noParks = noParkText.getText().split(",");
                 	
-                	//checkString 메소드에서 차량/위치 번호 입력 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
-                	if(!checkString(handicapText.getText()) || !checkString(noParkText.getText())) {
-                		JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
-                		return;
-            		} 
-                	
-    				while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
-                		//위치 번호 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
-                		if(clientTableValue[line][2].equals(handicapText.getText()) || clientTableValue[line][2].equals(noParkText.getText())) {
-                            JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
-                            return; //해당 위치 번호를 반환
-                    	}
-                		line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
+                	//checkString 메소드에서 장애인 전용 주차 구역, 주차 불가 구역 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
+                	if(!handicapText.getText().equals("")) {
+                		for(int i = 0; i < handicaps.length; i++)
+                			if(!checkString(handicaps[i])){
+                				JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
+                        		return;
+                			}
+                	}else
+                		handicaps[0] = "0";
+                	if(!noParkText.getText().equals("")) {
+                		for(int i = 0; i < noParks.length; i++)
+                    		if(!checkString(noParks[i]) ){
+                    			JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
+                        		return;
+                    		}
+                	}else
+                		noParks[0] = "0";
+                	//위치 번호 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
+                	if(isExist(handicaps) || isExist(noParks)) {
+                		JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
+                        return;
                 	}
+        			
+        			OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
     				
-        			if(handicapText.getText().equals("") && noParkText.getText().equals("")) { //ID/PW 입력 창에 아무 값도 입력하지 않은 경우
-            			JOptionPane.showMessageDialog(null, "관리자 ID 및 비밀번호는 최소 1자리 이상이여야 합니다");
-            		} else { //
-            			OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
-        				
-        				//파일에 변경한 관리자 ID, 비밀번호를 적어놓음
-        				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-        						+ "\n장애인 전용 주차 구역:"+handicapText.getText() + "\n주차 불가 구역:"+noParkText.getText());
-            			byte[] by = str.getBytes();
-            			os.write(by);
-            			
-            			JOptionPane.showMessageDialog(null, "설정하신 특수 주차 공간이 정상적으로 적용됐습니다");
-            			dispose(); 
-            			new GUIMain(); //메인 화면으로 이동
-            		}
+    				//파일에 변경한 값을 적어놓음
+    				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+    						+ "\n장애인 전용 주차 구역:"+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", noParks));
+        			byte[] by = str.getBytes();
+        			os.write(by);
+        			
+        			JOptionPane.showMessageDialog(null, "설정하신 특수 주차 공간이 정상적으로 적용됐습니다");
+        			dispose(); 
+        			new GUIMain(); //메인 화면으로 이동
+        			
     			} catch(Exception e1) { //예외 처리
     				System.out.println(e1.getMessage());
     	        	e1.printStackTrace();

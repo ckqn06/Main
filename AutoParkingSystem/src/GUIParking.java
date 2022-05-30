@@ -1,8 +1,19 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class GUIParking extends JFrame{
 	private JPanel p = new JPanel();
@@ -18,6 +29,8 @@ public class GUIParking extends JFrame{
     
     private JButton cancleButton = new JButton("취소"); //취소 버튼
     private JButton parkingButton = new JButton("주차"); //주차 버튼
+    
+    private File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
 
     GUIParking(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -85,30 +98,55 @@ public class GUIParking extends JFrame{
             public void actionPerformed(ActionEvent e) {
             	ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
             	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
-            	int line = 0; //고객 테이블의 행 수를 확인하기 위한 변수 생성
-            	
-            	//checkString 메소드에서 차량/위치 번호 입력 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
-            	if(!checkString(carNumText.getText(), placeText.getText())) {
-            		JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
-            		return;
-        		} 
-            	
-            	while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
-            		//위치 번호 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
-            		if(clientTableValue[line][2].equals(placeText.getText())) {
-                        JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
-                        return; //해당 위치 번호를 반환
-                	}else if(clientTableValue[line][0].equals(carNumText.getText())) {
-                		JOptionPane.showMessageDialog(null, "해당 차량 번호는 이미 있는 차량입니다"); 
-                        return;
+            	try {
+            		BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
+                	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
+                	String setting = null; //관리자 데이터 파일을 읽어들이기 위한 변수
+                	
+                	while((setting = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
+                		list.add(setting); //읽어들인 내용을 리스트에 저장
                 	}
-            		line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
+                	
+                	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
+                	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
+                	
+                	//배열의 n번째에 저장된 장애인/주차 불가 구역 번호의 내용을 저장하기 위한 변수
+                	String noParkStr = arr[6];
+                	
+                	String[] noParks = noParkStr.split(":")[1].split(",");
+                	
+                	//checkString 메소드에서 차량/위치 번호 입력 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
+                	if(!checkString(carNumText.getText(), placeText.getText())) {
+                		JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
+                		return;
+            		} 
+                	
+                	for(int line = 0; line < clientTableValue.length; line++) {
+                		//위치 번호 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
+                		if(clientTableValue[line][2].equals(placeText.getText())) {
+                            JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
+                            return;
+                    	}else if(clientTableValue[line][0].equals(carNumText.getText())) {
+                    		JOptionPane.showMessageDialog(null, "해당 차량 번호는 이미 있는 차량입니다"); 
+                            return;
+                    	}
+                		
+                		for(int i = 0; i < noParks.length; i++) {
+                			if(noParks[i].equals(placeText.getText())) {
+                				JOptionPane.showMessageDialog(null, "해당 위치 번호는 주차 불가 공간입니다"); 
+                                return;
+                			}
+                		}
+                	}
+                	
+                	//고객 테이블에 동일한 차량/위치 번호가 존재하지 않는 경우 입력된 차량/위치 번호를 DB파일에 저장
+                	dbc.data_insert(carNumText.getText(), placeText.getText());
+                	
+                	dispose();
+                	new GUIMain();
+            	}catch(Exception e1) {
+            		System.out.println(e1.getMessage());
             	}
-            	//고객 테이블에 동일한 차량/위치 번호가 존재하지 않는 경우 입력된 차량/위치 번호를 DB파일에 저장
-            	dbc.data_insert(carNumText.getText(), placeText.getText());
-            	
-            	dispose();
-            	new GUIMain();
         	}		        	             
         });
     }

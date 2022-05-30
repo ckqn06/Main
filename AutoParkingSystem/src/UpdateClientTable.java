@@ -17,9 +17,11 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
     private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
     
     private int width, height, tpay; //가로, 세로, 시간당 주차 비용을 위한 변수
-    int VerticalScrollBarMax = 0; //가로 스크롤의 최대 크기
-    int VerticalScrollBar = 0; //세로 스크롤의 위치
-    int HorizontalScrollBar = 0; //가로 스크롤의 위치
+    private String[] handicaps, noParks; //장애인 전용 주차 구역, 주차 불가 구역을 위한 변수
+    private int VerticalScrollBarMax = 0; //가로 스크롤의 최대 크기
+    private int HorizontalScrollBarMax = 0; //세로 스크롤의 최대 크기
+    private int VerticalScrollBar = 0; //세로 스크롤의 위치
+    private int HorizontalScrollBar = 0; //가로 스크롤의 위치
 	
 	public UpdateClientTable(GUIMain main, JTable clientTable) {
 		this.main = main;
@@ -30,10 +32,16 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 	    	String widthStr = br.readLine();  //데이터 파일에서 문자열 추출
 	    	String heightStr = br.readLine();
 	    	String payStr = br.readLine();
+	    	for(int i = 0; i < 2; i++)
+	    		br.readLine(); //필요 없는 데이터 
+	    	String handicapStr = br.readLine();
+	    	String noParkStr = br.readLine();
 	    	
 	    	width = Integer.parseInt(widthStr.split(":")[1]); //값 추출
 	    	height = Integer.parseInt(heightStr.split(":")[1]);
 	    	tpay = Integer.parseInt(payStr.split(":")[1]);
+	    	handicaps = handicapStr.split(":")[1].split(",");
+	    	noParks = noParkStr.split(":")[1].split(",");
 		}catch(Exception e) {}
 	}
 	
@@ -46,6 +54,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 				if(placePane != null) { //메인 화면의 주차 공간 테이블에서 스크롤이 존재한다면
 					main.p2.remove(placePane); //메인 화면의 주차 공간 테이블에서 스크롤바를 제거함
 					VerticalScrollBarMax = placePane.getVerticalScrollBar().getMaximum();
+					HorizontalScrollBarMax = placePane.getHorizontalScrollBar().getMaximum();
 					VerticalScrollBar = placePane.getVerticalScrollBar().getValue(); //현재 세로 스크롤의 위치를 가져옴
 			        HorizontalScrollBar = placePane.getHorizontalScrollBar().getValue(); //현재 가로 스크롤의 위치를 가져옴
 				}
@@ -57,16 +66,32 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        	//셀의 색상 변경을 위해 javax.swing.JTable prepareRenderer() 메소드를 오버라이딩하여 테이블의 셀이 렌더링되도록 함
 		        	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		        		JComponent cell = (JComponent) super.prepareRenderer(renderer, row, column);
-		        		int line = 0; //고객 테이블의 행 수를 확인하기 위한 변수 생성
 		        		
-		        		while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
+		        		for(int line = 0; line < clientTableValue.length; line++) {
 		        			//주차 공간 테이블에 존재하는 위치 번호 중에 고객 테이블에 저장된 위치 번호와 동일한 값이 존재한다면
 		        			if(clientTableValue[line][2].equals(placeView.getValueAt(row, column).toString())) {
 		        				cell.setBackground(Color.RED); //해당 셀(위치 번호)의 배경을 빨간색으로 지정하여 주차된 공간임을 표시
 		        				return cell; //해당 셀을 반환
 		        			}
-		        			line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
 		        		}
+		        		
+
+	        			//주차 불가 구역으로 설정된 값이라면
+	        			for(int i = 0; i < noParks.length; i++) {
+	        				if(noParks[i].equals(placeView.getValueAt(row, column).toString())) {
+	        					cell.setBackground(Color.BLACK); //해당 셀(위치 번호)의 배경을 검은색으로 지정하여 주차 불가 공간임을 표시
+	        					return cell;
+	        				}
+	        			}
+		        		
+		        		//장애인 전용 주차 구역으로 설정된 값이라면
+	        			for(int i = 0; i < handicaps.length; i++) { 
+	        				if(handicaps[i].equals(placeView.getValueAt(row, column).toString())) {
+	        					cell.setBackground(Color.GREEN); //해당 셀(위치 번호)의 배경을 초록색으로 지정하여 장애인 전용 공간임을 표시
+	        					return cell;
+	        				}
+	        			}
+		        		
 		        		cell.setBackground(Color.white); //동일한 위치 번호가 없다면 해당 셀의 배경을 흰색으로 지정하여 빈 공간임을 표시 
 		        		return cell;
 		        	}
@@ -93,6 +118,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        placePane.getViewport().setBackground(new Color(113, 135, 190));
 		        placePane.setBorder(BorderFactory.createEmptyBorder());
 		        placePane.getVerticalScrollBar().setMaximum(VerticalScrollBarMax);
+		        placePane.getHorizontalScrollBar().setMaximum(HorizontalScrollBarMax);
 		        placePane.getVerticalScrollBar().setValue(VerticalScrollBar);
 		        placePane.getHorizontalScrollBar().setValue(HorizontalScrollBar);
 		        
@@ -102,20 +128,19 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
 				
 				int row = clientTable.getRowCount(); //DB파일에 생성된 고객 테이블의 열 수를 가져오기 위한 변수 생성
-				int line = 0; //고객 테이블의 행 수를 확인하기 위한 변수 생성
 				
 				for(int i=0; i<row; i++) { //DB파일에서 가져온 고객 테이블의 열 중에서 필요없는(데이터가 없어 비어있는) 열은 삭제함
 					clientModel.removeRow(0);
 				}
 				
-				while(clientTableValue[line][0] != null) { //차량 번호가 null이 아닐 때까지 반복
+				for(int line = 0; line < clientTableValue.length; line++) {
 					int diffTime = GUIMain.diffTime(clientTableValue[line][1]); //고객 테이블의 2번째 열에 주차 시간을 저장시킴
 					int pay = ((diffTime/15 + 1) * (tpay/4))/10; //주차 시간을 통해 주차 비용 계산
 		        	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분"; //계산한 주차 시간(분 단위)을 시간, 분으로 표시
 		        	//고객 테이블의 열에 차량 번호, 주차 시간, 위치 번호, 시간당 주차 비용을 추가
 		        	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], pay*10+" 원"});
-		        	line++; //동일한 값이 존재하지 않는다면 line의 값을 증가시켜 다음 행을 탐색
-		        }
+				}
+				
 				Thread.sleep(2000); //스레드를 다시 갱신시키기까지 2초를 대기시킴
 			}
 		} catch(Exception e) { //인터럽트 발생시 인터럽트 발생 메시지를 출력

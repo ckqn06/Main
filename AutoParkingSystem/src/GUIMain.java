@@ -199,16 +199,14 @@ public class GUIMain extends JFrame {
         clientTable.setRowHeight(30);
         //고객 테이블 내부 데이터를 다루기 위해서 DefaultTableModel을 불러옴
         DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
-        int line = 0;
         
-        while(clientTableValue[line][0] != null) {
+        for(int line = 0; line < clientTableValue.length; line++) {
         	int diffTime = diffTime(clientTableValue[line][1]); //고객 테이블의 2번째 열에 주차 시간을 저장시킴
         	int pay = ((diffTime/15 + 1) * (tpay/4))/10; //주차 시간을 통해 주차 비용 계산
         	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분"; //계산한 주차 시간(분 단위)을 시간, 분으로 표시
         	
         	//고객 테이블의 열에 차량 번호, 주차 시간, 위치 번호, 주차 비용을 추가
         	clientModel.addRow(new Object[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], pay*10+" 원"});
-        	line++;
         }
         
         TableColumnModel tcm = clientTable.getColumnModel(); //정렬할 테이블의 ColumnModel을 가져옴
@@ -248,13 +246,8 @@ public class GUIMain extends JFrame {
         parkButton.addActionListener(new ActionListener() { //주차하기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
-        		int line = 0;
         		
-        		while(clientTableValue[line][0] != null) {
-        			line++; //값을 증가시켜 맨 마지막 행에 line을 위치시킴
-        		}
-        		
-        		if(line == width * height) { //line의 값이 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
+        		if(clientTableValue.length == width * height) { //테이블의 행 값이 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
         			JOptionPane.showMessageDialog(null, "현재 주차장이 가득 차서 주차가 불가능합니다");
         		}else { //line의 값이 주차 공간의 가로*세로 값보다 작다면 현재 주차장은 여유 공간이 존재
         			uct.interrupt(); //스레드(UpdateClientTable)에 인터럽트를 걸음(데이터 갱신을 중지시킴)
@@ -275,10 +268,9 @@ public class GUIMain extends JFrame {
         searchButton.addActionListener(new ActionListener() { //검색 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		String[][] clientTableValue = dbc.getTable();
-        		int line = 0;
         		boolean isExist = false; //일치하는 차가 있는지 확인하는 변수
         		
-        		while(clientTableValue[line][0] != null) {
+        		for(int line = 0; line < clientTableValue.length; line++) {
         			if(clientTableValue[line][0].equals(carNumText.getText()) && clientTableValue[line][2].equals(placeNumText.getText()))
         				isExist = true; //고객 테이블의 행을 읽어 고객이 차량/위치 번호 입력 창에 입력한 값과 동일한 값이 고객 테이블에 존재한다면
         			else if(clientTableValue[line][0].equals(carNumText.getText()) && placeNumText.getText().equals(""))
@@ -297,7 +289,6 @@ public class GUIMain extends JFrame {
                 		new GUISearch(new String[]{clientTableValue[line][0], parkTime, clientTableValue[line][2], ""+pay*10+" 원"});
                 		return;
         			}
-        			line++;
         		}
         		JOptionPane.showMessageDialog(null, "해당 차량 혹은 위치 번호에 해당하는 차량이 없습니다"); //고객 테이블에 동일한 값이 존재하지 않는다면
         	}

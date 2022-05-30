@@ -1,5 +1,10 @@
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class ParkDBConnection {
     private Connection conn; //DB 커넥션 연결 객체
@@ -49,22 +54,19 @@ public class ParkDBConnection {
     }
     
     public String[][] getTable(){ //2차원 배열 테이블 값을 가져오기 위한 메소드
-    	String[][] a = new String[150][3]; //가로줄(행) 3개, 세로줄(열) 150개 생성
+    	ArrayList<String[]> clientTableValue = new ArrayList<String[]>(); //가로줄(행) 3개, 세로줄(열) 150개 생성
     	String Query = "SELECT * FROM ParkGuest"; //ParkDB DB파일 내의 ParkGuest 테이블에 저장된 모든 데이터를 선택함
-    	int i = 0;
-    	
+
     	try {
 			rs = stmt.executeQuery(Query);
 			
 			while(rs.next()) { //요소가 남아있을 때까지 다음 요소를 선택함
-	    		for(int j=0; j<3; j++) {
-	    			a[i][j] = rs.getString(j + 1); //ParGuest 테이블에 저장된 데이터를 String형으로 받아옴
-	    		}
-	    		i++;
+				clientTableValue.add(new String[] {rs.getString(1), rs.getString(2), rs.getString(3)}); //ParGuest 테이블에 저장된 데이터를 String형으로 받아옴
 	    	}
+			
 		} catch (SQLException e) { //테이블 값이 정상적으로 가져와지지 않는다면 예외 처리
 			e.printStackTrace();
 		}
-    	return a; //테이블 값을 반환함
+    	return clientTableValue.toArray(new String[clientTableValue.size()][]); //테이블 값을 반환함
     }
 }

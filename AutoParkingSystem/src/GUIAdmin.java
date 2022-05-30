@@ -65,7 +65,7 @@ public class GUIAdmin extends JFrame{
         	public void actionPerformed(ActionEvent e) {
         		String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
         		
-    			if(clientTableValue[0][0] == null) { //현재 주차장에 차가 주차되어있지 않은지 확인
+    			if(clientTableValue.length == 0) { //현재 주차장에 차가 주차되어있지 않은지 확인
         				dispose(); 
         				new GUIAdminSetting(); //관리자 데이터 파일 값 변경 화면으로 이동
         		}else {
