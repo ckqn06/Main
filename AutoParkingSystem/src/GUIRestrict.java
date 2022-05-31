@@ -18,11 +18,12 @@ public class GUIRestrict extends JFrame{
     private JTextField handicapText = new JTextField(); //장애인 전용 공간 입력 창
     private JTextField noParkText = new JTextField(); //주차 불가 공간 입력 창
     
-    private JButton SettingButton = new JButton("추가"); //추가 버튼
+    private JButton AddButton = new JButton("추가"); //추가 버튼
     private JButton DeleteButton = new JButton("제거"); //제거 버튼
     private JButton CancleButton = new JButton("취소"); //취소 버튼
     
     private String width, height, pay, ID, PW; //가로, 세로, 관리자 ID, 비밀번호를 저장하는 변수
+    private String[] currentHandi, currentNoPark;
     
     private File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
 
@@ -34,18 +35,6 @@ public class GUIRestrict extends JFrame{
         this.setSize(1000, 800);
         this.setVisible(true);
         setLocationRelativeTo(null);
-    }
-    
-    private boolean isExist(String[] place) { //입력한 위치 값과 동일한 번호가 고객 테이블에 존재하는지 확인하기 위한 메소드
-    	ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
-    	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
-    	
-    	for(int line = 0; line < clientTableValue.length; line++) //고객 테이블의 길이만큼 행을 읽어들임
-    		for(int i = 0; i < place.length; i++) 
-        		if(clientTableValue[line][2].equals(place[i])) //입력한 위치 값과 동일한 번호가 고객 테이블에 존재한다면
-                    return true;
-    	
-    	return false; //입력한 위치 값과 동일한 번호가 고객 테이블에 존재하지 않는다면
     }
 
     private void formDesign() { //각 GUI 객체 설정
@@ -68,6 +57,8 @@ public class GUIRestrict extends JFrame{
             	String payStr = arr[2];
             	String IDStr = arr[3];
             	String PWStr = arr[4];
+            	String HandiStr = arr[5];
+            	String noParkStr = arr[6];
             	
             	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
             	width = widthStr.split(":")[1];
@@ -75,6 +66,8 @@ public class GUIRestrict extends JFrame{
             	pay = payStr.split(":")[1];
             	ID = IDStr.split(":")[1];
             	PW = PWStr.split(":")[1];
+            	currentHandi = HandiStr.split(":")[1].split(",");
+            	currentNoPark = noParkStr.split(":")[1].split(",");
             	
             	br.close(); //버퍼를 닫음
     		}
@@ -114,9 +107,9 @@ public class GUIRestrict extends JFrame{
         noParkText.setLocation(470, 460);
         noParkText.setFont(font);
         
-        SettingButton.setLocation(650, 630);
-        SettingButton.setSize(160, 80);
-        SettingButton.setFont(font);
+        AddButton.setLocation(650, 630);
+        AddButton.setSize(160, 80);
+        AddButton.setFont(font);
         
         DeleteButton.setLocation(400, 630);
         DeleteButton.setSize(160, 80);
@@ -132,63 +125,86 @@ public class GUIRestrict extends JFrame{
         p.add(noParkLabel);
         p.add(handicapText);
         p.add(noParkText);
-        p.add(SettingButton);
+        p.add(AddButton);
         p.add(DeleteButton);
         p.add(CancleButton);
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정    	
-    	SettingButton.addActionListener(new ActionListener() { //설정 버튼 클릭 시 실행
+    	AddButton.addActionListener(new ActionListener() { //설정 버튼 클릭 시 실행
     		public void actionPerformed(ActionEvent e) {
     			try {
-                	//입력받은 값을 split() 메서드를 이용해 ","를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
+    				ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+                	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
                 	String[] handicaps = handicapText.getText().split(",");
                 	String[] noParks = noParkText.getText().split(",");
+                	int settingOp;
                 	
-                	//장애인 전용 구역 입력 창에 공백이 입력된 상태에서
-                	if(!handicapText.getText().equals("")) {
-                		for(int i = 0; i < handicaps.length; i++)
-                			if(!checkString(handicaps[i])){ //입력된 값이 올바르지 않게 입력된 것이 확인됐다면
-                				JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
-                        		return;
-                			}
-                	}else //정상적인 값이 입력된 것이 확인됐다면 해당 값은 0으로 설정
-                		handicaps[0] = "0";
-                	
-                	//주차 불가 구역 입력 창에 공백이 입력된 상태라면
-                	if(!noParkText.getText().equals("")) {
-                		for(int i = 0; i < noParks.length; i++)
-                    		if(!checkString(noParks[i]) ){
-                    			JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
-                        		return;
-                    		}
-                	}else
-                		noParks[0] = "0";
-                	
-                	//만약 두 입력 창에 입력한 값 중에서 겹치는 값이 존재한다면
-                	if(handicapText.getText().contains(noParkText.getText())) {
-                		JOptionPane.showMessageDialog(null, "입력하신 값 중에서 겹치는 값이 존재합니다");
+                	//checkString 메소드에서 장애인 전용 주차 구역, 주차 불가 구역 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
+                	if(handicapText.getText().equals("") && noParkText.getText().equals("")) {
+                		JOptionPane.showMessageDialog(null, "값을 입력해주세요");
                 		return;
                 	}
                 	
-                	//장애인 전용/주차 불가 구역 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
-                	if(isExist(handicaps) || isExist(noParks)) {
-                		JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
-                        return;
+                	settingOp = checkSetting(handicaps, noParks); //현재 입력 창의 입력된 값이 어떤 유형인지 파악
+                	
+                	if(settingOp == -1) {
+                		JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
+                		return;
                 	}
-        			
-        			OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
-    				
-    				//관리자 데이터 파일에 설저안 장애인 전용/주차 불가 구역 값을 적어놓음
-    				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-    						+ "\n장애인 전용 주차 구역:"+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", noParks));
-        			byte[] by = str.getBytes();
+                	
+                	String str = "";
+                	if(settingOp == 1) {
+                		for(int i = 0; i < handicaps.length; i++)
+                			for(int j = 0; j < currentHandi.length; j++) {
+                				if(handicaps[i].equals(currentHandi[j])) {
+                					JOptionPane.showMessageDialog(null, "이미 장애인 전용 구역으로 설정된 값이 있습니다");
+                					return;
+                				}
+                			}
+                		for(int i = 0; i < noParks.length; i++)
+                			for(int j = 0; j < currentNoPark.length; j++) {
+                				if(noParks[i].equals(currentNoPark[j])) {
+                					JOptionPane.showMessageDialog(null, "이미 주차 불가 구역으로 설정된 값이 있습니다");
+                					return;
+                				}
+                			}
+        				//파일에 변경한 값을 적어놓음
+        				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+        						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi)+","+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", currentNoPark)+","+String.join(",", noParks));
+                	}else if(settingOp == 2) {
+                		for(int i = 0; i < handicaps.length; i++)
+                			for(int j = 0; j < currentHandi.length; j++) {
+                				if(handicaps[i].equals(currentHandi[j])) {
+                					JOptionPane.showMessageDialog(null, "이미 장애인 전용 구역으로 설정된 값이 있습니다");
+                					return;
+                				}
+                			}
+        				
+        				//파일에 변경한 값을 적어놓음
+        				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+        						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi)+","+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", currentNoPark));
+                	}else if(settingOp == 3) {
+                		for(int i = 0; i < noParks.length; i++)
+                			for(int j = 0; j < currentNoPark.length; j++) {
+                				if(noParks[i].equals(currentNoPark[j])) {
+                					JOptionPane.showMessageDialog(null, "이미 주차 불가 구역으로 설정된 값이 있습니다");
+                					return;
+                				}
+                			}
+        				
+        				//파일에 변경한 값을 적어놓음
+        				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+        						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi) + "\n주차 불가 구역:"+String.join(",", currentNoPark)+","+String.join(",", noParks));
+                	}
+                	OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
+                	byte[] by = str.getBytes();
         			os.write(by);
+        			os.close();
         			
         			JOptionPane.showMessageDialog(null, "설정하신 특수 주차 공간이 정상적으로 적용됐습니다");
         			dispose(); 
         			new GUIMain(); //메인 화면으로 이동
-        			
     			} catch(Exception e1) { //예외 처리
     				System.out.println(e1.getMessage());
     	        	e1.printStackTrace();
@@ -198,8 +214,155 @@ public class GUIRestrict extends JFrame{
     	
     	DeleteButton.addActionListener(new ActionListener() { //제거 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		dispose();
-        		new GUIAdmin(); //관리자 설정 화면으로 이동
+        		ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+            	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
+            	String[] handicaps = handicapText.getText().split(",");
+            	String[] noParks = noParkText.getText().split(",");
+            	int settingOp;
+            	
+            	//checkString 메소드에서 장애인 전용 주차 구역, 주차 불가 구역 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
+            	if(handicapText.getText().equals("") && noParkText.getText().equals("")) {
+            		JOptionPane.showMessageDialog(null, "값을 입력해주세요");
+            		return;
+            	}
+            	
+            	settingOp = checkSetting(handicaps, noParks); //현재 입력 창의 입력된 값이 어떤 유형인지 파악
+            	
+            	if(settingOp == -1) {
+            		JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
+            		return;
+            	}
+            	
+            	String str = "";
+            	if(settingOp == 1) {
+            		for(int i = 0; i < handicaps.length; i++) {
+            			Boolean isExist = false; //현재 장애인 전용 주차 구역 설정에 있는 값인지 확인하는 변수
+            			for(int j = 0; j < currentHandi.length; j++) {
+            				if(handicaps[i].equals(currentHandi[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+        					JOptionPane.showMessageDialog(null, "장애인 전용 주차 구역으로 설정되어 있지 않은 값이 있습니다");
+        					return;
+        				}
+            		}
+            		for(int i = 0; i < noParks.length; i++){
+            			Boolean isExist = false; //현재 주차 불가 구역 설정에 있는 값인지 확인하는 변수
+            			for(int j = 0; j < currentNoPark.length; j++) {
+            				if(noParks[i].equals(currentNoPark[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+        					JOptionPane.showMessageDialog(null, "주차 불가 구역으로 설정되어 있지 않은 값이 있습니다");
+        					return;
+        				}
+            		}
+            		
+            		String finalHandicap = "0"; //삭제되고 남은 설정 값
+            		for(int i = 0; i < currentHandi.length; i++) {
+            			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
+            			for(int j = 0; j < handicaps.length; j++) {
+            				if(currentHandi[i].equals(handicaps[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+            				finalHandicap += ","+currentHandi[i];
+        				}
+            		}
+            		String finalNoPark = "0"; //삭제되고 남은 설정 값
+            		for(int i = 0; i < currentNoPark.length; i++) {
+            			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
+            			for(int j = 0; j < noParks.length; j++) {
+            				if(currentNoPark[i].equals(noParks[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+            				finalNoPark += ","+currentNoPark[i];
+        				}
+            		}
+            		
+            		
+    				//파일에 변경한 값을 적어놓음
+    				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+    						+ "\n장애인 전용 주차 구역:"+finalHandicap + "\n주차 불가 구역:"+finalNoPark);
+            	}else if(settingOp == 2) {
+            		for(int i = 0; i < handicaps.length; i++) {
+            			Boolean isExist = false; //현재 장애인 전용 주차 구역 설정에 있는 값인지 확인하는 변수
+            			for(int j = 0; j < currentHandi.length; j++) {
+            				if(handicaps[i].equals(currentHandi[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+        					JOptionPane.showMessageDialog(null, "장애인 전용 주차 구역으로 설정되어 있지 않은 값이 있습니다");
+        					return;
+        				}
+            		}
+            		
+            		String finalHandicap = "0"; //삭제되고 남은 설정 값
+            		for(int i = 0; i < currentHandi.length; i++) {
+            			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
+            			for(int j = 0; j < handicaps.length; j++) {
+            				if(currentHandi[i].equals(handicaps[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+            				finalHandicap += ","+currentHandi[i];
+        				}
+            		}
+    				
+    				//파일에 변경한 값을 적어놓음
+    				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+    						+ "\n장애인 전용 주차 구역:"+finalHandicap + "\n주차 불가 구역:"+String.join(",", currentNoPark));
+            	}else if(settingOp == 3) {
+            		for(int i = 0; i < noParks.length; i++){
+            			Boolean isExist = false; //현재 주차 불가 구역 설정에 있는 값인지 확인하는 변수
+            			for(int j = 0; j < currentNoPark.length; j++) {
+            				if(noParks[i].equals(currentNoPark[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+        					JOptionPane.showMessageDialog(null, "주차 불가 구역으로 설정되어 있지 않은 값이 있습니다");
+        					return;
+        				}
+            		}
+            		
+            		String finalNoPark = "0"; //삭제되고 남은 설정 값
+            		for(int i = 0; i < currentNoPark.length; i++) {
+            			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
+            			for(int j = 0; j < noParks.length; j++) {
+            				if(currentNoPark[i].equals(noParks[j])) {
+            					isExist = true;
+            				}
+            			}
+            			if(!isExist) {
+            				finalNoPark += ","+currentNoPark[i];
+        				}
+            		}
+            		
+    				//파일에 변경한 값을 적어놓음
+    				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
+    						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi) + "\n주차 불가 구역:"+finalNoPark);
+            	}
+            	try {
+            		OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
+                	byte[] by = str.getBytes();
+        			os.write(by);
+        			os.close();
+            	}catch(Exception e2) {
+            		System.out.println(e2.getMessage());
+            	} 
+            	
+    			
+    			JOptionPane.showMessageDialog(null, "설정하신 특수 주차 공간이 정상적으로 적용됐습니다");
+    			dispose(); 
+    			new GUIMain(); //메인 화면으로 이동
         	}
         });
     	
@@ -239,6 +402,32 @@ public class GUIRestrict extends JFrame{
     		return false;
     	}
     	return false; //기본은 false 반환
+    }
+    
+    private int checkSetting(String[] handicaps, String[] noParks) { //입력 창에 입력된 값이 어떤 형식인지 파악
+    	Boolean checkHandi = true;
+    	Boolean checkNoPark = true;
+    	
+    	for(int i = 0; i < handicaps.length; i++)
+			if(!checkString(handicaps[i])) {
+				checkHandi = false;
+				break;
+			}
+    	for(int i = 0; i < noParks.length; i++)
+    		if(!checkString(noParks[i]) ){
+    			
+    			checkNoPark = false;
+				break;
+    		}
+    	
+    	if(checkHandi&& checkNoPark) //둘다 올바른 값일 때
+    		return 1;
+    	else if (checkHandi&& noParkText.getText().equals("")) //하나는 올바른 값이고 하나는 공백일 때
+    		return 2;
+    	else if (handicapText.getText().equals("") && checkNoPark) //하나는 올바른 값이고 하나는 공백일 때
+    		return 3;
+    	
+    	return -1; //올바르지 않은 값일 때
     }
     
     public static void main(String[] args) {
