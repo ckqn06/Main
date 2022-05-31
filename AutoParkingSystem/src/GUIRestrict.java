@@ -18,7 +18,8 @@ public class GUIRestrict extends JFrame{
     private JTextField handicapText = new JTextField(); //장애인 전용 공간 입력 창
     private JTextField noParkText = new JTextField(); //주차 불가 공간 입력 창
     
-    private JButton SettingButton = new JButton("설정"); //설정 버튼
+    private JButton SettingButton = new JButton("추가"); //추가 버튼
+    private JButton DeleteButton = new JButton("제거"); //제거 버튼
     private JButton CancleButton = new JButton("취소"); //취소 버튼
     
     private String width, height, pay, ID, PW; //가로, 세로, 관리자 ID, 비밀번호를 저장하는 변수
@@ -35,16 +36,16 @@ public class GUIRestrict extends JFrame{
         setLocationRelativeTo(null);
     }
     
-    private boolean isExist(String[] place) {
+    private boolean isExist(String[] place) { //입력한 위치 값과 동일한 번호가 고객 테이블에 존재하는지 확인하기 위한 메소드
     	ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
     	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
     	
-    	for(int line = 0; line < clientTableValue.length; line++) 
+    	for(int line = 0; line < clientTableValue.length; line++) //고객 테이블의 길이만큼 행을 읽어들임
     		for(int i = 0; i < place.length; i++) 
         		if(clientTableValue[line][2].equals(place[i])) //입력한 위치 값과 동일한 번호가 고객 테이블에 존재한다면
                     return true;
     	
-    	return false;
+    	return false; //입력한 위치 값과 동일한 번호가 고객 테이블에 존재하지 않는다면
     }
 
     private void formDesign() { //각 GUI 객체 설정
@@ -113,11 +114,15 @@ public class GUIRestrict extends JFrame{
         noParkText.setLocation(470, 460);
         noParkText.setFont(font);
         
-        SettingButton.setLocation(550, 630);
+        SettingButton.setLocation(650, 630);
         SettingButton.setSize(160, 80);
         SettingButton.setFont(font);
         
-        CancleButton.setLocation(250, 630);
+        DeleteButton.setLocation(400, 630);
+        DeleteButton.setSize(160, 80);
+        DeleteButton.setFont(font);
+        
+        CancleButton.setLocation(150, 630);
         CancleButton.setSize(160, 80);
         CancleButton.setFont(font);
         
@@ -128,6 +133,7 @@ public class GUIRestrict extends JFrame{
         p.add(handicapText);
         p.add(noParkText);
         p.add(SettingButton);
+        p.add(DeleteButton);
         p.add(CancleButton);
     }
 
@@ -135,20 +141,21 @@ public class GUIRestrict extends JFrame{
     	SettingButton.addActionListener(new ActionListener() { //설정 버튼 클릭 시 실행
     		public void actionPerformed(ActionEvent e) {
     			try {
-    				ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
-                	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
+                	//입력받은 값을 split() 메서드를 이용해 ","를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
                 	String[] handicaps = handicapText.getText().split(",");
                 	String[] noParks = noParkText.getText().split(",");
                 	
-                	//checkString 메소드에서 장애인 전용 주차 구역, 주차 불가 구역 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
+                	//장애인 전용 구역 입력 창에 공백이 입력된 상태에서
                 	if(!handicapText.getText().equals("")) {
                 		for(int i = 0; i < handicaps.length; i++)
-                			if(!checkString(handicaps[i])){
+                			if(!checkString(handicaps[i])){ //입력된 값이 올바르지 않게 입력된 것이 확인됐다면
                 				JOptionPane.showMessageDialog(null, "올바른 값을 입력해주세요");
                         		return;
                 			}
-                	}else
+                	}else //정상적인 값이 입력된 것이 확인됐다면 해당 값은 0으로 설정
                 		handicaps[0] = "0";
+                	
+                	//주차 불가 구역 입력 창에 공백이 입력된 상태라면
                 	if(!noParkText.getText().equals("")) {
                 		for(int i = 0; i < noParks.length; i++)
                     		if(!checkString(noParks[i]) ){
@@ -157,7 +164,14 @@ public class GUIRestrict extends JFrame{
                     		}
                 	}else
                 		noParks[0] = "0";
-                	//위치 번호 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
+                	
+                	//만약 두 입력 창에 입력한 값 중에서 겹치는 값이 존재한다면
+                	if(handicapText.getText().contains(noParkText.getText())) {
+                		JOptionPane.showMessageDialog(null, "입력하신 값 중에서 겹치는 값이 존재합니다");
+                		return;
+                	}
+                	
+                	//장애인 전용/주차 불가 구역 입력 창에 입력한 값과 동일한 번호가 고객 테이블에 존재한다면
                 	if(isExist(handicaps) || isExist(noParks)) {
                 		JOptionPane.showMessageDialog(null, "해당 위치 번호는 이미 차지하고 있는 공간입니다"); 
                         return;
@@ -165,7 +179,7 @@ public class GUIRestrict extends JFrame{
         			
         			OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
     				
-    				//파일에 변경한 값을 적어놓음
+    				//관리자 데이터 파일에 설저안 장애인 전용/주차 불가 구역 값을 적어놓음
     				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
     						+ "\n장애인 전용 주차 구역:"+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", noParks));
         			byte[] by = str.getBytes();
@@ -181,6 +195,13 @@ public class GUIRestrict extends JFrame{
     			}
     		}
     	});
+    	
+    	DeleteButton.addActionListener(new ActionListener() { //제거 버튼 클릭 시 실행
+        	public void actionPerformed(ActionEvent e) {
+        		dispose();
+        		new GUIAdmin(); //관리자 설정 화면으로 이동
+        	}
+        });
     	
     	CancleButton.addActionListener(new ActionListener() { //취소 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {

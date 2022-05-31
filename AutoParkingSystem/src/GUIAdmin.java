@@ -76,8 +76,14 @@ public class GUIAdmin extends JFrame{
 		
 		restrictButton.addActionListener(new ActionListener() { //특수 주차 공간 설정 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		dispose();
-        		new GUIRestrict(); //특수 주차 공간 설정 화면으로 이동
+        		String[][] clientTableValue = dbc.getTable();
+        		
+    			if(clientTableValue.length == 0) {
+        				dispose(); 
+        				new GUIRestrict(); //특수 주차 공간 설정 화면으로 이동
+        		}else {
+        			JOptionPane.showMessageDialog(null, "현재 고객이 존재하여 설정 변경이 불가능합니다");
+        		}
         	}
         });
 		

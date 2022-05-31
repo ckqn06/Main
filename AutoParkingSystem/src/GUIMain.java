@@ -247,7 +247,8 @@ public class GUIMain extends JFrame {
         	public void actionPerformed(ActionEvent e) {
         		String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
         		
-        		if(clientTableValue.length == width * height) { //테이블의 행 값이 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
+        		//테이블의 행 값이 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
+        		if(clientTableValue.length == width * height) {
         			JOptionPane.showMessageDialog(null, "현재 주차장이 가득 차서 주차가 불가능합니다");
         		}else { //line의 값이 주차 공간의 가로*세로 값보다 작다면 현재 주차장은 여유 공간이 존재
         			uct.interrupt(); //스레드(UpdateClientTable)에 인터럽트를 걸음(데이터 갱신을 중지시킴)

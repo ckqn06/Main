@@ -17,11 +17,12 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
     private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
     
     private int width, height, tpay; //가로, 세로, 시간당 주차 비용을 위한 변수
-    private String[] handicaps, noParks; //장애인 전용 주차 구역, 주차 불가 구역을 위한 변수
     private int VerticalScrollBarMax = 0; //가로 스크롤의 최대 크기
     private int HorizontalScrollBarMax = 0; //세로 스크롤의 최대 크기
     private int VerticalScrollBar = 0; //세로 스크롤의 위치
     private int HorizontalScrollBar = 0; //가로 스크롤의 위치
+    
+    private String[] handicaps, noParks; //장애인 전용 주차 구역, 주차 불가 구역을 위한 변수
 	
 	public UpdateClientTable(GUIMain main, JTable clientTable) {
 		this.main = main;
@@ -32,8 +33,9 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 	    	String widthStr = br.readLine();  //데이터 파일에서 문자열 추출
 	    	String heightStr = br.readLine();
 	    	String payStr = br.readLine();
+	    	
 	    	for(int i = 0; i < 2; i++)
-	    		br.readLine(); //필요 없는 데이터 
+	    		br.readLine(); //필요 없는 데이터
 	    	String handicapStr = br.readLine();
 	    	String noParkStr = br.readLine();
 	    	
@@ -75,7 +77,6 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        			}
 		        		}
 		        		
-
 	        			//주차 불가 구역으로 설정된 값이라면
 	        			for(int i = 0; i < noParks.length; i++) {
 	        				if(noParks[i].equals(placeView.getValueAt(row, column).toString())) {

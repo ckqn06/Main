@@ -78,7 +78,7 @@ public class GUIPayCarChoice extends JFrame{
                     	return;
             		} 
             	}
-            	
+            	//고객 테이블에 존재하는 차량 번호 중에 차량 번호 입력 창에서 입력한 값과 동일한 값이 존재하지 않는다면
             	JOptionPane.showMessageDialog(null, "해당 차량번호는 주차장을 이용하지 않은 차량입니다");
             	return;
         	}		       	             

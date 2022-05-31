@@ -12,6 +12,8 @@ public class GUIAdminSetting extends JFrame{
 	//화면에 보여주는 메시지 설정
     private JLabel placeLabel = new JLabel("▶ 주차 공간 설정");
     private JLabel detailLabel = new JLabel("<html>(최소 가로 1칸/세로 1칸<br/>최대 가로 10칸/세로 15칸 설정 가능)</html>");
+    private JLabel detailLabel_2 = new JLabel("※최소 가로 1칸/세로 1칸, 최대 가로 10칸/세로 15칸 설정 가능.");
+    private JLabel cautionLabel = new JLabel("※설정 변경시, 장애인 전용/주차 불가 구역 설정이 초기화됩니다.");
     private JLabel widthLabel = new JLabel("가로 :");
     private JLabel heightLabel = new JLabel("세로 :");
     private JLabel payLabel = new JLabel("▶ 시간당 주차 비용 설정");
@@ -51,7 +53,7 @@ public class GUIAdminSetting extends JFrame{
             	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
             	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
 
-            	//배열의 n번째에 저장된 관리자 ID, 비밀번호, 장애인/주차 불가 구역 번호의 내용을 저장하기 위한 변수
+            	//배열의 n번째에 저장된 관리자 ID, 비밀번호 내용을 저장하기 위한 변수
             	String IDStr = arr[3];
             	String PWStr = arr[4];
             	
@@ -73,11 +75,12 @@ public class GUIAdminSetting extends JFrame{
         placeLabel.setSize(600, 100);
         placeLabel.setHorizontalAlignment(SwingConstants.LEFT);
         placeLabel.setFont(font);
-
-        detailLabel.setLocation(100, 50);
-        detailLabel.setSize(1000, 200);
-        detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        detailLabel.setFont(new Font("고딕", Font.PLAIN, 30));
+        
+        cautionLabel.setLocation(77, 80);
+        cautionLabel.setSize(1000, 200);
+        cautionLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        cautionLabel.setFont(new Font("고딕", Font.PLAIN, 30));
+        cautionLabel.setForeground(Color.red);
         
         widthLabel.setLocation(120, 205);
         widthLabel.setSize(500, 100);
@@ -111,21 +114,34 @@ public class GUIAdminSetting extends JFrame{
         SettingButton.setFont(font);
         
         if(!f.exists()) { //만약 관리자 데이터 파일이 존재하지 않는다면 (= 데이터 파일을 새로 생성하는 경우)
+        	detailLabel.setLocation(100, 50);
+        	detailLabel.setSize(1000, 200);
+            detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
+            detailLabel.setFont(new Font("고딕", Font.PLAIN, 30));
+            
         	SettingButton.setText("설정"); //설정 버튼의 텍스트를 "설정 변경"에서 "설정"으로 변경
         }
         
         if(f.exists()) {
+        	detailLabel_2.setLocation(77, 30);
+        	detailLabel_2.setSize(1000, 200);
+            detailLabel_2.setHorizontalAlignment(SwingConstants.LEFT);
+            detailLabel_2.setFont(new Font("고딕", Font.PLAIN, 30));
+            
         	SettingButton.setLocation(540, 650);
         	SettingButton.setSize(230, 80);
         	
         	CancleButton.setLocation(230, 650);
             CancleButton.setSize(160, 80);
             CancleButton.setFont(font);
+            
+            p.add(cautionLabel);
         	p.add(CancleButton);
         }
         
         p.add(placeLabel);
         p.add(detailLabel);
+        p.add(detailLabel_2);
         p.add(widthLabel);
         p.add(heightLabel);
         p.add(payLabel);
@@ -148,8 +164,9 @@ public class GUIAdminSetting extends JFrame{
         					OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
         					
             				//파일에 가로/세로 값, 시간당 주차 비용 값을 적어놓음
-        					String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID
-    						+ "\nPW:"+PW + "\n장애인 전용 주차 구역:0\n주차 불가 구역:0"); //설정 변경 시 오류 방지를 위해 장애인 전용 주차 구역과 주차 불가 구역 값 초기화
+        					//오류 방지를 위해 설정 변경 시 장애인 전용/주차 불가 구역의 값은 0으로 초기화
+        					String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay
+        							+ "\nID:"+ID + "\nPW:"+PW + "\n장애인 전용 주차 구역:0" + "\n주차 불가 구역:0");
                 			byte[] by = str.getBytes();
                 			os.write(by);
                 				
@@ -184,6 +201,7 @@ public class GUIAdminSetting extends JFrame{
     		}
     	});
     }
+    
     public static void main(String[] args) {
 		new GUIAdminSetting();
 	}

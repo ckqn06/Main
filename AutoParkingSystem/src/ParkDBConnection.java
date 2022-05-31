@@ -1,8 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -10,7 +6,7 @@ public class ParkDBConnection {
     private Connection conn; //DB 커넥션 연결 객체
     private static final String USERNAME = "user"; //DBMS(데이터베이스 관리 시스템)에 접속하기 위한 아이디
     private static final String PASSWORD = "1234"; //DBMS(데이터베이스 관리 시스템)에 접속하기 위한 비밀번호
-    private static final String URL = "jdbc:mysql://localhost:9001/ParkDB?useUnicode=true&characterEncoding=utf8"; //JDBC 드라이버 주소
+    private static final String URL = "jdbc:mysql://localhost:3306/ParkDB?useUnicode=true&characterEncoding=utf8"; //JDBC 드라이버 주소
 
 	private Statement stmt; //쿼리 작업을 실행하기 위한 객체
 	private ResultSet rs; //쿼리를 실행한 결과값을 저장하는 객체
@@ -54,14 +50,15 @@ public class ParkDBConnection {
     }
     
     public String[][] getTable(){ //2차원 배열 테이블 값을 가져오기 위한 메소드
-    	ArrayList<String[]> clientTableValue = new ArrayList<String[]>(); //가로줄(행) 3개, 세로줄(열) 150개 생성
+    	ArrayList<String[]> clientTableValue = new ArrayList<String[]>(); //고객 테이블의 데이터를 저장하기 위한 ArrayList 생성
     	String Query = "SELECT * FROM ParkGuest"; //ParkDB DB파일 내의 ParkGuest 테이블에 저장된 모든 데이터를 선택함
 
     	try {
 			rs = stmt.executeQuery(Query);
 			
 			while(rs.next()) { //요소가 남아있을 때까지 다음 요소를 선택함
-				clientTableValue.add(new String[] {rs.getString(1), rs.getString(2), rs.getString(3)}); //ParGuest 테이블에 저장된 데이터를 String형으로 받아옴
+				//ParGuest 테이블에 저장된 데이터를 String형으로 받아옴 (각각 차량 번호, 주차 시간, 위치 번호를 받아옴)
+				clientTableValue.add(new String[] {rs.getString(1), rs.getString(2), rs.getString(3)});
 	    	}
 			
 		} catch (SQLException e) { //테이블 값이 정상적으로 가져와지지 않는다면 예외 처리
