@@ -25,7 +25,7 @@ public class GUIRestrict extends JFrame{
     private String width, height, pay, ID, PW; //가로, 세로, 관리자 ID, 비밀번호를 저장하는 변수
     private String[] currentHandi, currentNoPark;
     
-    private File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
 
     GUIRestrict(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -39,37 +39,17 @@ public class GUIRestrict extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(f.exists()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-    			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-            	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
-            	String line = null; //관리자 데이터 파일을 읽어들이기 위한 변수
-            	
-            	while((line = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
-            		list.add(line); //읽어들인 내용을 리스트에 저장
-            	}
-            	
-            	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
-            	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
+    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
+    			String[] settingData = sct.getSetting();
             	
             	//배열의 n번째에 저장된 가로, 세로, 시간당 주차 비용, 장애인/주차 불가 구역 번호의 내용을 저장하기 위한 변수
-            	String widthStr = arr[0];
-            	String heightStr = arr[1];
-            	String payStr = arr[2];
-            	String IDStr = arr[3];
-            	String PWStr = arr[4];
-            	String HandiStr = arr[5];
-            	String noParkStr = arr[6];
-            	
-            	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-            	width = widthStr.split(":")[1];
-            	height = heightStr.split(":")[1];
-            	pay = payStr.split(":")[1];
-            	ID = IDStr.split(":")[1];
-            	PW = PWStr.split(":")[1];
-            	currentHandi = HandiStr.split(":")[1].split(",");
-            	currentNoPark = noParkStr.split(":")[1].split(",");
-            	
-            	br.close(); //버퍼를 닫음
+            	width = settingData[0];
+            	height = settingData[1];
+            	pay = settingData[2];
+            	ID = settingData[3];
+            	PW = settingData[4];
+            	currentHandi = settingData[5].split(",");
+            	currentNoPark = settingData[6].split(",");
     		}
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
@@ -134,8 +114,7 @@ public class GUIRestrict extends JFrame{
     	AddButton.addActionListener(new ActionListener() { //설정 버튼 클릭 시 실행
     		public void actionPerformed(ActionEvent e) {
     			try {
-    				ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
-                	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
+                	String[][] clientTableValue = sct.getTableData(); //DB파일 내의 고객 테이블을 가져옴
                 	String[] handicaps = handicapText.getText().split(",");
                 	String[] noParks = noParkText.getText().split(",");
                 	int settingOp;
@@ -153,7 +132,7 @@ public class GUIRestrict extends JFrame{
                 		return;
                 	}
                 	
-                	String str = "";
+                	String[] settingData = {};
                 	if(settingOp == 1) {
                 		for(int i = 0; i < handicaps.length; i++)
                 			for(int j = 0; j < currentHandi.length; j++) {
@@ -170,9 +149,8 @@ public class GUIRestrict extends JFrame{
                 				}
                 			}
         				//파일에 변경한 값을 적어놓음
-        				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-        						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi)+","+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", currentNoPark)+","+String.join(",", noParks));
-                	}else if(settingOp == 2) {
+                		settingData = new String[]{width, height, pay, ID, PW, String.join(",", currentHandi)+","+String.join(",", handicaps), String.join(",", currentNoPark)+","+String.join(",", noParks)};
+        			}else if(settingOp == 2) {
                 		for(int i = 0; i < handicaps.length; i++)
                 			for(int j = 0; j < currentHandi.length; j++) {
                 				if(handicaps[i].equals(currentHandi[j])) {
@@ -182,8 +160,7 @@ public class GUIRestrict extends JFrame{
                 			}
         				
         				//파일에 변경한 값을 적어놓음
-        				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-        						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi)+","+String.join(",", handicaps) + "\n주차 불가 구역:"+String.join(",", currentNoPark));
+                		settingData = new String[]{width, height, pay, ID, PW, String.join(",", currentHandi)+","+String.join(",", handicaps), String.join(",", currentNoPark)};
                 	}else if(settingOp == 3) {
                 		for(int i = 0; i < noParks.length; i++)
                 			for(int j = 0; j < currentNoPark.length; j++) {
@@ -194,13 +171,9 @@ public class GUIRestrict extends JFrame{
                 			}
         				
         				//파일에 변경한 값을 적어놓음
-        				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-        						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi) + "\n주차 불가 구역:"+String.join(",", currentNoPark)+","+String.join(",", noParks));
+                		settingData = new String[]{width, height, pay, ID, PW, String.join(",", currentHandi), String.join(",", currentNoPark)+","+String.join(",", noParks)};
                 	}
-                	OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
-                	byte[] by = str.getBytes();
-        			os.write(by);
-        			os.close();
+                	sct.setSetting(settingData);
         			
         			JOptionPane.showMessageDialog(null, "설정하신 특수 주차 공간이 정상적으로 적용됐습니다");
         			dispose(); 
@@ -214,8 +187,6 @@ public class GUIRestrict extends JFrame{
     	
     	DeleteButton.addActionListener(new ActionListener() { //제거 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
-            	String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
             	String[] handicaps = handicapText.getText().split(",");
             	String[] noParks = noParkText.getText().split(",");
             	int settingOp;
@@ -233,7 +204,7 @@ public class GUIRestrict extends JFrame{
             		return;
             	}
             	
-            	String str = "";
+            	String[] settingData = {};
             	if(settingOp == 1) {
             		for(int i = 0; i < handicaps.length; i++) {
             			Boolean isExist = false; //현재 장애인 전용 주차 구역 설정에 있는 값인지 확인하는 변수
@@ -261,7 +232,7 @@ public class GUIRestrict extends JFrame{
             		}
             		
             		String finalHandicap = "0"; //삭제되고 남은 설정 값
-            		for(int i = 0; i < currentHandi.length; i++) {
+            		for(int i = 1; i < currentHandi.length; i++) {
             			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
             			for(int j = 0; j < handicaps.length; j++) {
             				if(currentHandi[i].equals(handicaps[j])) {
@@ -273,7 +244,7 @@ public class GUIRestrict extends JFrame{
         				}
             		}
             		String finalNoPark = "0"; //삭제되고 남은 설정 값
-            		for(int i = 0; i < currentNoPark.length; i++) {
+            		for(int i = 1; i < currentNoPark.length; i++) {
             			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
             			for(int j = 0; j < noParks.length; j++) {
             				if(currentNoPark[i].equals(noParks[j])) {
@@ -287,8 +258,7 @@ public class GUIRestrict extends JFrame{
             		
             		
     				//파일에 변경한 값을 적어놓음
-    				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-    						+ "\n장애인 전용 주차 구역:"+finalHandicap + "\n주차 불가 구역:"+finalNoPark);
+            		settingData = new String[] {width, height, pay, ID, PW, finalHandicap, finalNoPark};
             	}else if(settingOp == 2) {
             		for(int i = 0; i < handicaps.length; i++) {
             			Boolean isExist = false; //현재 장애인 전용 주차 구역 설정에 있는 값인지 확인하는 변수
@@ -304,7 +274,7 @@ public class GUIRestrict extends JFrame{
             		}
             		
             		String finalHandicap = "0"; //삭제되고 남은 설정 값
-            		for(int i = 0; i < currentHandi.length; i++) {
+            		for(int i = 1; i < currentHandi.length; i++) {
             			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
             			for(int j = 0; j < handicaps.length; j++) {
             				if(currentHandi[i].equals(handicaps[j])) {
@@ -317,8 +287,7 @@ public class GUIRestrict extends JFrame{
             		}
     				
     				//파일에 변경한 값을 적어놓음
-    				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-    						+ "\n장애인 전용 주차 구역:"+finalHandicap + "\n주차 불가 구역:"+String.join(",", currentNoPark));
+            		settingData = new String[] {width, height, pay, ID, PW, finalHandicap, String.join(",", currentNoPark)};
             	}else if(settingOp == 3) {
             		for(int i = 0; i < noParks.length; i++){
             			Boolean isExist = false; //현재 주차 불가 구역 설정에 있는 값인지 확인하는 변수
@@ -334,7 +303,7 @@ public class GUIRestrict extends JFrame{
             		}
             		
             		String finalNoPark = "0"; //삭제되고 남은 설정 값
-            		for(int i = 0; i < currentNoPark.length; i++) {
+            		for(int i = 1; i < currentNoPark.length; i++) {
             			Boolean isExist = false; //현재 삭제되어야 하는 값인지 확인
             			for(int j = 0; j < noParks.length; j++) {
             				if(currentNoPark[i].equals(noParks[j])) {
@@ -347,18 +316,9 @@ public class GUIRestrict extends JFrame{
             		}
             		
     				//파일에 변경한 값을 적어놓음
-    				str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+ID + "\nPW:"+PW
-    						+ "\n장애인 전용 주차 구역:"+String.join(",", currentHandi) + "\n주차 불가 구역:"+finalNoPark);
+            		settingData = new String[] {width, height, pay, ID, PW, String.join(",", currentHandi), finalNoPark};
             	}
-            	try {
-            		OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
-                	byte[] by = str.getBytes();
-        			os.write(by);
-        			os.close();
-            	}catch(Exception e2) {
-            		System.out.println(e2.getMessage());
-            	} 
-            	
+            	sct.setSetting(settingData);
     			
     			JOptionPane.showMessageDialog(null, "설정하신 특수 주차 공간이 정상적으로 적용됐습니다");
     			dispose(); 
@@ -377,14 +337,10 @@ public class GUIRestrict extends JFrame{
     //차량/위치 번호 입력 창에 입력된 값이 올바른 값인지 확인하는 메소드
     private boolean checkString(String place) {
     	try { //관리자 데이터 파일에서 가로, 세로 값이 적힌 텍스트를 읽어들임
-    		BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
+    		String[] settingData = sct.getSetting();
     		
-    		String widthStr = br.readLine();
-        	String heightStr = br.readLine();
-        	
-        	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-        	int width = Integer.parseInt(widthStr.split(":")[1]);
-        	int height = Integer.parseInt(heightStr.split(":")[1]);
+        	int width = Integer.parseInt(settingData[0]);
+        	int height = Integer.parseInt(settingData[1]);
     		
     		//위치 번호 입력 창에서 입력받은 값의 첫 번째 자리가 알파벳(대문자)이며, 주차 공간 테이블의 세로 값 안에 있으며
     		if((place.charAt(0) >= 65 && place.charAt(0) < 65 + height)) { 

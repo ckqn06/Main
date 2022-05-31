@@ -13,7 +13,8 @@ public class GUIPayCarChoice extends JFrame{
     private JButton cancleButton = new JButton("취소"); //취소 버튼
     private JButton checkButton = new JButton("입력"); //입력 버튼
     
-    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
+    
     private int tpay; //고객이 지불해야 할 돈을 저장하기 위한 변수
 
     GUIPayCarChoice(int tpay){ //화면 기본 설정
@@ -64,7 +65,7 @@ public class GUIPayCarChoice extends JFrame{
         
         checkButton.addActionListener(new ActionListener() { //입력 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
+            	String[][] clientTableValue = sct.getTableData(); //DB파일에 저장된 고객 테이블의 값을 불러옴
             	
             	for(int line = 0; line < clientTableValue.length; line++) {
             		//고객 테이블에 존재하는 차량 번호 중에 차량 번호 입력 창에서 입력한 값과 동일한 값이 존재한다면

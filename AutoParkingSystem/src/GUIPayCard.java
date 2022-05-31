@@ -13,7 +13,7 @@ public class GUIPayCard extends JFrame{
     private JButton cancleButton = new JButton("결제 취소"); //결제 취소 버튼
     private JButton payButton = new JButton("결제하기"); //결제하기 버튼
     
-    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체s
     
     private String carNum; //고객의 차량 번호를 저장하기 위한 변수
     private int pay; //고객이 지불해야 할 돈을 저장하기 위한 변수
@@ -75,7 +75,7 @@ public class GUIPayCard extends JFrame{
             		//카드 번호 입력 창에 정수의 값이 입력된 경우 결제를 완료함
             		JOptionPane.showMessageDialog(null, "결제가 완료됐습니다");
             		
-                	dbc.data_delete(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB파일에서 제거
+                	sct.deleteData(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB파일에서 제거
             		dispose();
                 	new GUIMain(); //메인 화면으로 이동
             	} catch (Exception e1) { //카드 번호 입력 창에 정수 외의 값이 입력된 경우 예외 발생

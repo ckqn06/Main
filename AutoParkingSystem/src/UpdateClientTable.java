@@ -14,7 +14,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 	
 	private JScrollPane placePane; //주차 공간 테이블의 스크롤바 생성
 	
-    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+	private ServerConnection sct = new ServerConnection(); //서버 연결 객체
     
     private int width, height, tpay; //가로, 세로, 시간당 주차 비용을 위한 변수
     private int VerticalScrollBarMax = 0; //가로 스크롤의 최대 크기
@@ -28,22 +28,13 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		this.main = main;
 		this.clientTable = clientTable;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-
-	    	String widthStr = br.readLine();  //데이터 파일에서 문자열 추출
-	    	String heightStr = br.readLine();
-	    	String payStr = br.readLine();
+			String[] settingData = sct.getSetting();
 	    	
-	    	for(int i = 0; i < 2; i++)
-	    		br.readLine(); //필요 없는 데이터
-	    	String handicapStr = br.readLine();
-	    	String noParkStr = br.readLine();
-	    	
-	    	width = Integer.parseInt(widthStr.split(":")[1]); //값 추출
-	    	height = Integer.parseInt(heightStr.split(":")[1]);
-	    	tpay = Integer.parseInt(payStr.split(":")[1]);
-	    	handicaps = handicapStr.split(":")[1].split(",");
-	    	noParks = noParkStr.split(":")[1].split(",");
+	    	width = Integer.parseInt(settingData[0]); //값 추출
+	    	height = Integer.parseInt(settingData[1]);
+	    	tpay = Integer.parseInt(settingData[2]);
+	    	handicaps = settingData[5].split(",");
+	    	noParks = settingData[6].split(",");
 		}catch(Exception e) {}
 	}
 	
@@ -61,7 +52,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 			        HorizontalScrollBar = placePane.getHorizontalScrollBar().getValue(); //현재 가로 스크롤의 위치를 가져옴
 				}
 				
-				String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
+				String[][] clientTableValue = sct.getTableData(); //DB파일에 저장된 고객 테이블의 값을 불러옴
 		       
 				placeView = new JTable(height, width) { //주차 공간 테이블의 행과 열을 관리자 데이터 파일에 적힌 가로/세로 값만큼 생성
 		        	@Override

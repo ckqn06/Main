@@ -45,7 +45,7 @@ public class GUIMain extends JFrame {
 
     private JScrollPane clientPane; //고객 테이블의 스크롤바 생성
     
-    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
     private UpdateClientTable uct; //고객 테이블의 데이터 갱신을 위한 스레드
     
     private int width, height, tpay = 0; //가로, 세로, 시간당 주차 비용 값을 0으로 초기화
@@ -79,18 +79,11 @@ public class GUIMain extends JFrame {
 
     public void formDesign() { //각 GUI 객체 설정
     	try { //관리자 데이터 파일에서 가로, 세로, 시간당 주차 비용 값이 적힌 텍스트를 읽어들임
-        	BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-
-        	String widthStr = br.readLine();
-        	String heightStr = br.readLine();
-        	String payStr = br.readLine();
+        	String[] settingData = sct.getSetting();
         	
-        	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-        	width = Integer.parseInt(widthStr.split(":")[1]);
-        	height = Integer.parseInt(heightStr.split(":")[1]);
-        	tpay = Integer.parseInt(payStr.split(":")[1]);
-        
-        	br.close(); //버퍼를 닫음
+        	width = Integer.parseInt(settingData[0]);
+        	height = Integer.parseInt(settingData[1]);
+        	tpay = Integer.parseInt(settingData[2]);
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
         	e.printStackTrace();
@@ -194,7 +187,7 @@ public class GUIMain extends JFrame {
         quitButton.setSize(170, 50);
         quitButton.setFont(font);
         
-        String[][] clientTableValue = dbc.getTable(); //DB파일에 저장된 고객 테이블의 값을 불러옴
+        String[][] clientTableValue = sct.getTableData(); //DB파일에 저장된 고객 테이블의 값을 불러옴
         
         clientTable.setRowHeight(30);
         //고객 테이블 내부 데이터를 다루기 위해서 DefaultTableModel을 불러옴
@@ -245,7 +238,7 @@ public class GUIMain extends JFrame {
     private void eventListner() { //버튼 클릭 이벤트 설정
         parkButton.addActionListener(new ActionListener() { //주차하기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
+        		String[][] clientTableValue = sct.getTableData(); //DB파일 내의 고객 테이블을 가져옴
         		
         		//테이블의 행 값이 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
         		if(clientTableValue.length == width * height) {
@@ -268,7 +261,7 @@ public class GUIMain extends JFrame {
         
         searchButton.addActionListener(new ActionListener() { //검색 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		String[][] clientTableValue = dbc.getTable();
+        		String[][] clientTableValue = sct.getTableData();
         		boolean isExist = false; //일치하는 차가 있는지 확인하는 변수
         		
         		for(int line = 0; line < clientTableValue.length; line++) {

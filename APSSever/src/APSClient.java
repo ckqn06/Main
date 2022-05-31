@@ -131,6 +131,7 @@ public class APSClient extends Thread{
 				}
 			}catch(Exception e) {
 				System.out.println(e.getMessage());
+				break;
 			}
 		}
 	}

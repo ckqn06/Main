@@ -13,7 +13,7 @@ public class GUIPayCash extends JFrame{
     private JButton cancleButton = new JButton("결제 취소"); //결제 취소 버튼
     private JButton payButton = new JButton("결제하기"); //결제하기 버튼
     
-    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
     
     private String carNum; //고객의 차량 번호를 저장하기 위한 변수
     private int pay; //고객이 지불해야 할 돈을 저장하기 위한 변수
@@ -77,7 +77,7 @@ public class GUIPayCash extends JFrame{
                         	
                     	JOptionPane.showMessageDialog(null, "결제가 완료됐습니다"); //결제가 완료되면 메시지 출력
                     	
-                    	dbc.data_delete(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB파일에서 제거
+                    	sct.deleteData(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB파일에서 제거
                     	dispose();
                     	new GUIMain();
                     } else { //현금(cash)이 내야하는 돈(pay)보다 적은 경우

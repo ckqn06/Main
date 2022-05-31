@@ -15,8 +15,5 @@ public class APSSever {
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 		}
-		
-
 	}
-
 }

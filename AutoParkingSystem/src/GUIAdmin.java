@@ -15,8 +15,8 @@ public class GUIAdmin extends JFrame{
     private JButton restrictButton = new JButton("주차 제한 구역 설정"); //주차 제한 구역 설정 버튼
     private JButton changeButton = new JButton("관리자 계정 ID/PW 변경"); //관리자 계정 ID/PW 변경 버튼
     private JButton gomainButton = new JButton("메인 화면으로 돌아가기"); //메인 화면으로 돌아가기 버튼
-	
-    private ParkDBConnection dbc = new ParkDBConnection(); //데이터베이스 연결 객체
+    
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
     
 	GUIAdmin() {
 		this.setTitle("무인 주차 관리 시스템");
@@ -63,7 +63,7 @@ public class GUIAdmin extends JFrame{
 	private void eventListner() { //버튼 클릭 이벤트 설정
 		dataButton.addActionListener(new ActionListener() { //관리자 데이터 파일 값 변경 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		String[][] clientTableValue = dbc.getTable(); //DB파일 내의 고객 테이블을 가져옴
+        		String[][] clientTableValue = sct.getTableData(); //DB파일 내의 고객 테이블을 가져옴
         		
     			if(clientTableValue.length == 0) { //현재 주차장에 차가 주차되어있지 않은지 확인
         				dispose(); 
@@ -76,7 +76,7 @@ public class GUIAdmin extends JFrame{
 		
 		restrictButton.addActionListener(new ActionListener() { //특수 주차 공간 설정 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		String[][] clientTableValue = dbc.getTable();
+        		String[][] clientTableValue = sct.getTableData();
         		
     			if(clientTableValue.length == 0) {
         				dispose(); 

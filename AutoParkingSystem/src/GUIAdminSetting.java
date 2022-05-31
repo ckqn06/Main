@@ -27,7 +27,7 @@ public class GUIAdminSetting extends JFrame{
     
     private String ID, PW; //관리자 ID, 비밀번호를 저장하는 변수
     
-    File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
 
     GUIAdminSetting(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -41,27 +41,12 @@ public class GUIAdminSetting extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(f.exists()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-    			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-            	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
-            	String line = null; //관리자 데이터 파일을 읽어들이기 위한 변수
+    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
+            	String[] settingData = sct.getSetting();
             	
-            	while((line = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
-            		list.add(line); //읽어들인 내용을 리스트에 저장
-            	}
-            	
-            	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
-            	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
-
             	//배열의 n번째에 저장된 관리자 ID, 비밀번호 내용을 저장하기 위한 변수
-            	String IDStr = arr[3];
-            	String PWStr = arr[4];
-            	
-            	//배열에 저장된 텍스트를 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-            	ID = IDStr.split(":")[1];
-            	PW = PWStr.split(":")[1];
-
-    			br.close(); //버퍼를 닫음
+            	ID = settingData[3];
+            	PW = settingData[4];
     		}
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
@@ -113,7 +98,7 @@ public class GUIAdminSetting extends JFrame{
         SettingButton.setSize(280, 80);
         SettingButton.setFont(font);
         
-        if(!f.exists()) { //만약 관리자 데이터 파일이 존재하지 않는다면 (= 데이터 파일을 새로 생성하는 경우)
+        if(!sct.isSetting()) { //만약 관리자 데이터 파일이 존재하지 않는다면 (= 데이터 파일을 새로 생성하는 경우)
         	detailLabel.setLocation(100, 50);
         	detailLabel.setSize(1000, 200);
             detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -122,7 +107,7 @@ public class GUIAdminSetting extends JFrame{
         	SettingButton.setText("설정"); //설정 버튼의 텍스트를 "설정 변경"에서 "설정"으로 변경
         }
         
-        if(f.exists()) {
+        if(sct.isSetting()) {
         	detailLabel_2.setLocation(77, 30);
         	detailLabel_2.setSize(1000, 200);
             detailLabel_2.setHorizontalAlignment(SwingConstants.LEFT);
@@ -160,26 +145,19 @@ public class GUIAdminSetting extends JFrame{
         			int pay = Integer.parseInt(payText.getText()); //시간당 주차 비용 입력 창에서 입력받은 값을 정수로 받아옴
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //가로, 세로 값이 범위 내의 값이며
-        				if(f.exists()) { //관리자 데이터 파일이 존재한다면
-        					OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
-        					
+        				if(sct.isSetting()) { //관리자 데이터 파일이 존재한다면
             				//파일에 가로/세로 값, 시간당 주차 비용 값을 적어놓음
-        					//오류 방지를 위해 설정 변경 시 장애인 전용/주차 불가 구역의 값은 0으로 초기화
-        					String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay
-        							+ "\nID:"+ID + "\nPW:"+PW + "\n장애인 전용 주차 구역:0" + "\n주차 불가 구역:0");
-                			byte[] by = str.getBytes();
-                			os.write(by);
-                				
+        					String[] setting = {""+width, ""+height, ""+pay, ID, PW, "0", "0"};
+        					
+        					sct.setSetting(setting);
+        					
                 			JOptionPane.showMessageDialog(null, "변경하신 설정 값이 정상적으로 적용됐습니다");
                 			dispose(); 
                 			new GUIMain(); //메인 화면으로 이동
         				} else { //관리자 데이터 파일이 존재하지 않는다면
-        					OutputStream os = new FileOutputStream(f);
+        					String[] setting = {""+width, ""+height, ""+pay, "admin", "park123", "0", "0"};
         					
-            				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay 
-            						+ "\nID:admin" + "\nPW:park123" + "\n장애인 전용 주차 구역:0" + "\n주차 불가 구역:0");
-                			byte[] by = str.getBytes();
-                			os.write(by);
+            				sct.setSetting(setting);
                 				
                 			JOptionPane.showMessageDialog(null, "입력하신 설정 값이 정상적으로 적용됐습니다");
                 			dispose(); 

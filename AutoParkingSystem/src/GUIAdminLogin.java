@@ -22,7 +22,7 @@ public class GUIAdminLogin extends JFrame{
     private int op; //실행 경로 확인을 위한 변수
     private String ID, PW; //ID, 비밀번호 확인을 위한 변수
     
-    File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
 
     GUIAdminLogin(int op){ //화면 기본 설정, op=1(첫 로그인), op=2(관리자 설정 로그인), op=3(종료하기)
     	this.op = op;
@@ -37,25 +37,11 @@ public class GUIAdminLogin extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(f.exists()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-    			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-            	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
-            	String line = null; //관리자 데이터 파일을 읽어들이기 위한 변수
+    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
+            	String[] settingData = sct.getSetting();
             	
-            	while((line = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
-            		list.add(line); //읽어들인 내용을 리스트에 저장
-            	}
-            	
-            	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
-            	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
-            	String IDStr = arr[3]; //배열의 4번째에 저장된 ID의 내용을 저장하기 위한 변수
-            	String PWStr = arr[4]; //배열의 5번째에 저장된 비밀번호의 내용을 저장하기 위한 변수
-            	
-            	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-            	ID = IDStr.split(":")[1];
-            	PW = PWStr.split(":")[1];
-            	
-            	br.close(); //버퍼를 닫음
+            	ID = settingData[3]; //배열의 4번째에 저장된 ID의 내용을 저장하기 위한 변수
+            	PW = settingData[4]; //배열의 5번째에 저장된 비밀번호의 내용을 저장하기 위한 변수
     		}
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
@@ -120,7 +106,7 @@ public class GUIAdminLogin extends JFrame{
         loginButton.addActionListener(new ActionListener() { //로그인 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
             	
-            	if(f.exists()) { //관리자 데이터 파일이 지정 경로에 존재하면서
+            	if(sct.isSetting()) { //관리자 데이터 파일이 지정 경로에 존재하면서
             		//관리자 데이터 파일에 설정된 아이디와 비밀번호가 ID/비밀번호 입력 창에 입력한 값과 동일하다면
             		if(IDText.getText().equals(ID) && passwordText.getText().equals(PW)) {
             			if(op == 1) { //시스템을 실행시켜 첫 로그인을 진행하는 경우

@@ -24,7 +24,7 @@ public class GUIChangeLogin extends JFrame{
     
     private String width, height, pay, handicap, noPark; //가로, 세로, 시간당 주차 비용, 장애인/주차 불가 구역 번호를 저장하는 변수
     
-    File f = new File("관리자 데이터 파일.txt"); //관리자 데이터 파일
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
 
     GUIChangeLogin(){ //화면 기본 설정
         this.setTitle("무인 주차 관리 시스템");
@@ -38,33 +38,15 @@ public class GUIChangeLogin extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(f.exists()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-    			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-            	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
-            	String line = null; //관리자 데이터 파일을 읽어들이기 위한 변수
-            	
-            	while((line = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
-            		list.add(line); //읽어들인 내용을 리스트에 저장
-            	}
-            	
-            	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
-            	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
-            	
+    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
+    			String[] settingData = sct.getSetting(); 
+    			
             	//배열의 n번째에 저장된 가로, 세로, 시간당 주차 비용, 장애인/주차 불가 구역 번호의 내용을 저장하기 위한 변수
-            	String widthStr = arr[0];
-            	String heightStr = arr[1];
-            	String payStr = arr[2];
-            	String handicapStr = arr[5];
-            	String noParkStr = arr[6];
-            	
-            	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-            	width = widthStr.split(":")[1];
-            	height = heightStr.split(":")[1];
-            	pay = payStr.split(":")[1];
-            	handicap = handicapStr.split(":")[1];
-            	noPark = noParkStr.split(":")[1];
-            	
-            	br.close(); //버퍼를 닫음
+            	width = settingData[0];
+            	height = settingData[1];
+            	pay = settingData[2];
+            	handicap = settingData[5];
+            	noPark = settingData[6];
     		}
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
@@ -132,14 +114,11 @@ public class GUIChangeLogin extends JFrame{
     			try {
         			if(IDText.getText().equals("") || PWText.getText().equals("")) { //ID/PW 입력 창에 아무 값도 입력하지 않은 경우
             			JOptionPane.showMessageDialog(null, "관리자 ID 및 비밀번호는 최소 1자리 이상이여야 합니다");
-            		} else { //
-            			OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
-        				
+            		} else { 
         				//파일에 변경한 관리자 ID, 비밀번호를 적어놓음
-        				String str = ("가로 값:"+width + "\n세로 값:"+height + "\n시간당 주차 비용:"+pay + "\nID:"+IDText.getText()
-        						+ "\nPW:"+PWText.getText() + "\n장애인 전용 주차 구역:"+handicap + "\n주차 불가 구역:"+noPark);
-            			byte[] by = str.getBytes();
-            			os.write(by);
+            			String[] settingData = {width, height, pay, IDText.getText(), PWText.getText(), handicap, noPark};
+            			
+            			sct.setSetting(settingData);
             			
             			JOptionPane.showMessageDialog(null, "변경하신 관리자 ID 및 비밀번호가 정상적으로 적용됐습니다");
             			dispose(); 
