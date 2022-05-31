@@ -2,9 +2,13 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class APSClient extends Thread{
 	private DataOutputStream dous; //문자열 및 수 데이터 출력 스트림
@@ -56,53 +60,50 @@ public class APSClient extends Thread{
 		}
 	}
 	
-	private void login() { //로그인을 위해 필요한 데이터 전송
-		if(f.exists()) { //파일이 있다면
-			try {
-				BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt")); //파일 연결 객체
-					
-				for (int i = 0; i < 5; i++) br.readLine(); // 필요없는 가로, 세로 등 필요 없는 값 무시
-	        	String IDStr = br.readLine(); //ID 정보 가져오기(예: ID:admin)
-	        	String passwordStr = br.readLine(); //비밀번호 정보 가져오기(예: password:park123)
-	        	
-	        	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-	        	String ID = IDStr.split(":")[1];
-	        	String password = passwordStr.split(":")[1];
-	        	
-	        	//값 전송
-	        	dous.writeUTF(IDStr);
-	        	dous.writeUTF(passwordStr);
-			}catch(Exception e) {
-				System.out.println(e.getMessage());
-			}
+	private void isSetting() { //파일이 존재하는지 전송
+		try {
+			dous.writeBoolean(f.exists());
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 	
 	private void getSetting() { //관리자 데이터 설정 정보 전송
 		try {
 			BufferedReader br = new BufferedReader(new FileReader("관리자 데이터 파일.txt"));
-				
-			String widthStr = br.readLine(); //가로 정보 가져오기(예: 가로:10)
-        	String heightStr = br.readLine(); //세로 정보 가져오기(예: 세로:15)
-        	String payStr = br.readLine(); //비용 정보 가져오기(예: 비용:10000)
-        	String handicapStr = br.readLine(); //장애인 전용 주차 구역 정보 가져오기(예: 장애인 전용 주차 구역:A1,A2,A3)
-        	String noParkStr = br.readLine(); //주차 불가 구역 정보 가져오기(예: 주차 불가 구역:B2,B3,B4)
+        	List<String> list = new ArrayList<String>(); //읽어들인 관리자 데이터 파일의 내용을 저장하기 위한 리스트 생성
+        	String line = null; //관리자 데이터 파일을 읽어들이기 위한 변수
         	
-        	br.close(); //버퍼를 닫음
+        	while((line = br.readLine()) != null) { //관리자 데이터 파일이 null이 아닐 때까지 읽어들임
+        		list.add(line); //읽어들인 내용을 리스트에 저장
+        	}
         	
-        	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
-        	int width = Integer.parseInt(widthStr.split(":")[1]);
-        	int height = Integer.parseInt(heightStr.split(":")[1]);
-        	int pay = Integer.parseInt(payStr.split(":")[1]);
-        	String[] handicap = handicapStr.split(":")[1].split(",");
-        	String[] noPark = noParkStr.split(":")[1].split(",");
+        	int ListSize = list.size(); //리스트에 저장된 객체의 수를 리턴
+        	String arr[] = list.toArray(new String[ListSize]); //리스트에 저장된 객체와 함께 배열로 변환함
         	
         	//값 전송
-        	dous.writeInt(width);
-        	dous.writeInt(height);
-        	dous.writeInt(pay);
-        	oous.writeObject(handicap);
-        	oous.writeObject(noPark);
+        	for(int i = 0; i < 7; i++) {
+        		dous.writeUTF(arr[i].split(":")[1]);
+        	}
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void setSetting() { //관리자 데이터 설정 정보 변경
+		try {
+			String[] settingValue = new String[7];
+			for(int i = 0; i < 7; i++) {
+				settingValue[i] = dins.readUTF();
+			}
+			String str = ("가로 값:"+settingValue[0] + "\n세로 값:"+settingValue[1] + "\n시간당 주차 비용:"+settingValue[2] + "\nID:"+settingValue[3] + "\nPW:"+settingValue[4]
+					+ "\n장애인 전용 주차 구역:"+settingValue[5] + "\n주차 불가 구역:"+settingValue[6]);
+    	
+			OutputStream os = new FileOutputStream(f); //파일에 텍스트를 입력하기 위한 출력 스트림 생성
+        	byte[] by = str.getBytes();
+			os.write(by);
+			os.close();
+			
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -121,10 +122,12 @@ public class APSClient extends Thread{
 					deleteDB();
 				}else if(command.equals("getTable")) { //고객 테이블 값 전송
 					getTableDB();
-				}else if(command.equals("login")) { //로그인 데이터 값 전송
-					login();
+				}else if(command.equals("isSetting")) { //고객 테이블 값 전송
+					isSetting();
 				}else if(command.equals("getSetting")) { //관리자 설정 값 전송
 					getSetting();
+				}else if(command.equals("setSetting")) { //관리자 설정 값 전송
+					setSetting();
 				}
 			}catch(Exception e) {
 				System.out.println(e.getMessage());
