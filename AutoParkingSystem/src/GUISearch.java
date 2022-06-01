@@ -23,7 +23,7 @@ public class GUISearch extends JFrame {
     private String[] clientValue; //테이블에 표시할 값을 저장하기 위한 변수
 
     GUISearch(String[] clientValue){ //화면 기본 설정
-    	this.clientValue = clientValue;
+    	this.clientValue = clientValue; //GUIMain 파일에서 받아온 고객 테이블 데이터를 저장
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -52,7 +52,7 @@ public class GUISearch extends JFrame {
         
         //고객 테이블 내부 데이터를 다루기 위해서 DefaultTableModel을 불러옴
         DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
-        clientModel.addRow(clientValue); //테이블에 검색된 결과 값 추가
+        clientModel.addRow(clientValue); //검색 결과 테이블에 검색된 결과 값 추가
         
         clientTable.setRowHeight(55);
         clientTable.getTableHeader().setFont(new Font("고딕", Font.PLAIN, 30));
@@ -61,12 +61,12 @@ public class GUISearch extends JFrame {
         clientPane.setLocation(45, 320);
         clientPane.setSize(900, 104);
         
-        dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
-        TableColumnModel tcm = clientTable.getColumnModel(); //정렬할 테이블의 ColumnModel을 가져옴
+        dtcr.setHorizontalAlignment(SwingConstants.CENTER); //검색 결과 테이블의 셀을 가운데 정렬함
+        TableColumnModel tcm = clientTable.getColumnModel(); //고객 테이블의 ColumnModel을 가져옴
         
-        for (int i = 0; i < tcm.getColumnCount(); i++) { //테이블의 셀을 가운데 정렬함
-        	tcm.getColumn(i).setCellRenderer(dtcr); 
-        } 
+        for (int i = 0; i < tcm.getColumnCount(); i++) { //고객 테이블에 존재하는 열만큼 테이블의 셀을 가운데 정렬함
+        	tcm.getColumn(i).setCellRenderer(dtcr);
+        }
 
         p.add(label);
         p.add(backButton);
@@ -86,12 +86,12 @@ public class GUISearch extends JFrame {
         	public void actionPerformed(ActionEvent e) {
         		int result = JOptionPane.showConfirmDialog(null, "해당 차량으로 결제를 진행하시겠습니까?", "결제 진행", JOptionPane.YES_NO_OPTION);
         		if(result == JOptionPane.YES_OPTION) { //Yes를 선택할 경우
-        			String carNum = clientValue[0]; //결과 테이블에 저장된 차량 번호를 저장하는 변수
-        			String won = clientValue[3].replace(" 원", ""); //결과 테이블에 저장된 주차 비용에서 "원"을 제외한 값을 저장하는 변수
+        			String carNum = clientValue[0]; //검색 결과 테이블에 검색한 차량 번호를 저장하는 변수
+        			String won = clientValue[3].replace(" 원", ""); //검색 결과 테이블에 검색한 차량의 주차 비용에서 "원"을 제외한 값을 저장하는 변수
         			int pay = Integer.parseInt(won); //추출한 주차 비용 값을 int형으로 변환
         			
         			dispose();
-        			new GUIPayMethodChoice(carNum, pay); //결과 테이블에 저장된 차량 번호와 주차 비용과 함께 결제 수단 화면으로 이동
+        			new GUIPayMethodChoice(carNum, pay); //검색 결과 테이블에 저장된 차량 번호와 주차 비용과 함께 결제 수단 화면으로 이동
         		}
         	}
         });

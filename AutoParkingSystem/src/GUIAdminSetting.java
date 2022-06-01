@@ -41,12 +41,11 @@ public class GUIAdminSetting extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-            	String[] settingData = sct.getSetting();
+    		if(sct.isSetting()) { //서버를 통해 관리자 데이터 파일의 존재 여부가 확인된다면
+            	String[] settingData = sct.getSetting(); //관리자 데이터 파일을 읽어들임
             	
-            	//배열의 n번째에 저장된 관리자 ID, 비밀번호 내용을 저장하기 위한 변수
-            	ID = settingData[3];
-            	PW = settingData[4];
+            	ID = settingData[3]; //배열의 4번째에 저장된 관리자 ID 값을 저장하기 위한 변수
+            	PW = settingData[4]; //배열의 5번째에 저장된 비밀번호의 값을 저장하기 위한 변수
     		}
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
@@ -98,7 +97,7 @@ public class GUIAdminSetting extends JFrame{
         SettingButton.setSize(280, 80);
         SettingButton.setFont(font);
         
-        if(!sct.isSetting()) { //만약 관리자 데이터 파일이 존재하지 않는다면 (= 데이터 파일을 새로 생성하는 경우)
+        if(!sct.isSetting()) { //관리자 데이터 파일이 존재하지 않는다면 (= 관리자 데이터 파일을 새로 생성하는 경우)
         	detailLabel.setLocation(100, 50);
         	detailLabel.setSize(1000, 200);
             detailLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -107,7 +106,7 @@ public class GUIAdminSetting extends JFrame{
         	SettingButton.setText("설정"); //설정 버튼의 텍스트를 "설정 변경"에서 "설정"으로 변경
         }
         
-        if(sct.isSetting()) {
+        if(sct.isSetting()) { //관리자 데이터 파일이 존재한다면 (= 관리자 데이터 파일 값 변경 버튼으로 온 경우)
         	detailLabel_2.setLocation(77, 30);
         	detailLabel_2.setSize(1000, 200);
             detailLabel_2.setHorizontalAlignment(SwingConstants.LEFT);
@@ -120,8 +119,8 @@ public class GUIAdminSetting extends JFrame{
             CancleButton.setSize(160, 80);
             CancleButton.setFont(font);
             
-            p.add(cautionLabel);
-        	p.add(CancleButton);
+            p.add(cautionLabel); //경고 메시지 생성 
+        	p.add(CancleButton); //취소 버튼 생성
         }
         
         p.add(placeLabel);
@@ -145,8 +144,8 @@ public class GUIAdminSetting extends JFrame{
         			int pay = Integer.parseInt(payText.getText()); //시간당 주차 비용 입력 창에서 입력받은 값을 정수로 받아옴
 
         			if(1<=width && width<=10 && 1<=height && height <= 15) { //가로, 세로 값이 범위 내의 값이며
-        				if(sct.isSetting()) { //관리자 데이터 파일이 존재한다면
-            				//파일에 가로/세로 값, 시간당 주차 비용 값을 적어놓음
+        				if(sct.isSetting()) { //서버를 통해 관리자 데이터 파일의 존재 여부가 확인된다면
+            				//입력받은 값을 관리자 데이터 파일에 가로/세로 값, 시간당 주차 비용 값으로 설정함
         					String[] setting = {""+width, ""+height, ""+pay, ID, PW, "0", "0"};
         					
         					sct.setSetting(setting);
@@ -163,7 +162,7 @@ public class GUIAdminSetting extends JFrame{
                 			dispose(); 
                 			new GUIMain();
         				}
-            		} else { //가로, 세로 값이 범위를 벗어났을 때 실행
+            		} else { //가로, 세로 값이 최소/최대 범위를 벗어났을 때 실행
             			JOptionPane.showMessageDialog(null, "범위 값 안의 값을 입력해주세요");
             		}
     			} catch(Exception e1) { //가로/세로, 시간당 주차 비용 입력 창에 정수형이 입력되지 않았다면
@@ -172,15 +171,11 @@ public class GUIAdminSetting extends JFrame{
     		}
     	});
     	
-    	CancleButton.addActionListener(new ActionListener() { //메인화면으로 버튼 클릭 시 실행
+    	CancleButton.addActionListener(new ActionListener() { //취소 버튼 클릭 시 실행
     		public void actionPerformed(ActionEvent e) {
     			dispose();
     			new GUIAdmin(); //관리자 화면으로 이동
     		}
     	});
     }
-    
-    public static void main(String[] args) {
-		new GUIAdminSetting();
-	}
 }

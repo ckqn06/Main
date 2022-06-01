@@ -86,12 +86,13 @@ public class GUIParking extends JFrame{
         
         parkingButton.addActionListener(new ActionListener() { //주차 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	String[][] clientTableValue = sct.getTableData(); //DB파일 내의 고객 테이블을 가져옴
+            	String[][] clientTableValue = sct.getTableData(); //서버를 통해 DB파일 내의 고객 테이블을 가져옴
             	
-            	try {
+            	try { //관리자 데이터 파일에서 값을 읽어들임
             		String[] settingData = sct.getSetting();
                 	
-                	//배열의 n번째에 저장된 주차 불가 구역 번호의 내용을 저장하기 위한 변수
+                	//배열의 6번째에 저장된 주차 불가 구역 번호의 내용을 저장하기 위한 변수
+            		//저장된 값을 split() 메서드를 이용해 ","를 기준으로 문자열을 나눈 뒤, 추출한 값을 출력
                 	String[] noParks = settingData[6].split(",");
                 	
                 	//checkString 메소드에서 차량/위치 번호 입력 창에 입력된 값이 올바르지 않게 입력된 것이 확인됐다면
@@ -113,13 +114,12 @@ public class GUIParking extends JFrame{
                 	}
                 	for(int i = 0; i < noParks.length; i++) {
             			//위치 번호 입력 창에 입력한 값과 동일한 번호가 주차 불가 공간으로 설정되어있다면
-            			System.out.println(noParks[i]+"aaaa");
             			if(noParks[i].equals(placeText.getText())) {
             				JOptionPane.showMessageDialog(null, "해당 위치 번호는 주차 불가 공간입니다"); 
                             return;
             			}
             		}
-                	//고객 테이블에 동일한 차량/위치 번호가 존재하지 않는 경우 입력된 차량/위치 번호를 DB파일에 저장
+                	//고객 테이블에 동일한 차량/위치 번호가 존재하지 않는 경우 입력된 차량/위치 번호를 DB에 데이터 삽입
                 	sct.insertData(carNumText.getText(), placeText.getText());
                 	
                 	dispose();
@@ -133,15 +133,14 @@ public class GUIParking extends JFrame{
     
     //차량/위치 번호 입력 창에 입력된 값이 올바른 값인지 확인하는 메소드
     private boolean checkString(String carNum, String place) {
-    	try { //관리자 데이터 파일에서 가로, 세로 값이 적힌 텍스트를 읽어들임
+    	try {
         	String[] settingData = sct.getSetting();
         	
-        	//읽어들인 텍스트에서 split() 메서드를 이용해 ":"를 기준으로 문자열을 나눈 뒤, 추출한 값을 각 변수에 대입
         	int width = Integer.parseInt(settingData[0]);
         	int height = Integer.parseInt(settingData[1]);
     		
         	String str = carNumText.getText();
-        	char check = str.charAt(2);
+        	char check = str.charAt(2); //차량 번호 입력 창에 입력한 값의 3번째 자리에 위치한 글자를 저장하는 변수
         	
     		if(carNumText.getText().length() != 7) //차량 번호 입력 창에서 입력받은 값이 7자리가 아니면
     			return false; //올바르지 않은 값으로 인식하여 false 반환

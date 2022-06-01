@@ -19,8 +19,8 @@ public class GUIPayCash extends JFrame{
     private int pay; //고객이 지불해야 할 돈을 저장하기 위한 변수
 
     GUIPayCash(String carNum, int pay){ //화면 기본 설정
-    	this.carNum = carNum;
-    	this.pay = pay;
+    	this.carNum = carNum; //GUIPayMethodChoice 파일에서 받아온 차량 번호를 저장
+    	this.pay = pay; //GUIPayMethodChoice 파일에서 받아온 주차 금액을 저장
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -71,13 +71,13 @@ public class GUIPayCash extends JFrame{
             		int cash = Integer.parseInt(cashText.getText()); //현금 입력 창에서 입력받은 값을 정수로 받아옴
             		
                     if(cash >= pay) { //현금(cash)이 내야하는 돈(pay)과 동일하며
-                    	if(cash > pay) { //현금(cash)이 내야하는 돈(pay)보다 많은 경우 거스름돈을 배출
+                    	if(cash > pay) { //현금(cash)이 내야하는 돈(pay)보다 많은 경우 거스름돈 배출
                     		JOptionPane.showMessageDialog(null, "거스름돈 " + (cash - pay) + "원을 배출했습니다"); //거스름돈 계산
                     	}
                         	
                     	JOptionPane.showMessageDialog(null, "결제가 완료됐습니다"); //결제가 완료되면 메시지 출력
                     	
-                    	sct.deleteData(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB파일에서 제거
+                    	sct.deleteData(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB에서 삭제
                     	dispose();
                     	new GUIMain();
                     } else { //현금(cash)이 내야하는 돈(pay)보다 적은 경우

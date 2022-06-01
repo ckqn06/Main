@@ -16,7 +16,7 @@ public class GUIChangeLogin extends JFrame{
     private JLabel IDLabel = new JLabel("관리자 ID :");
     private JLabel PWLabel = new JLabel("비밀번호 :");
 
-    private JTextField IDText = new JTextField(); //ID 입력 창
+    private JTextField IDText = new JTextField(); //관리자 ID 입력 창
     private JTextField PWText = new JTextField(); //비밀번호 입력 창
     
     private JButton ChangeButton = new JButton("변경"); //변경 버튼
@@ -38,10 +38,10 @@ public class GUIChangeLogin extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-    			String[] settingData = sct.getSetting(); 
+    		if(sct.isSetting()) { //서버를 통해 관리자 데이터 파일의 존재 여부가 확인된다면
+    			String[] settingData = sct.getSetting(); //관리자 데이터 파일을 읽어들임
     			
-            	//배열의 n번째에 저장된 가로, 세로, 시간당 주차 비용, 장애인/주차 불가 구역 번호의 내용을 저장하기 위한 변수
+            	//배열의 n번째에 저장된 가로, 세로, 시간당 주차 비용, 장애인 전용/주차 불가 구역의 값을 저장하기 위한 변수
             	width = settingData[0];
             	height = settingData[1];
             	pay = settingData[2];
@@ -109,13 +109,13 @@ public class GUIChangeLogin extends JFrame{
     }
 
     private void eventListner() { //버튼 클릭 이벤트 설정    	
-    	ChangeButton.addActionListener(new ActionListener() { //설정 버튼 클릭 시 실행
+    	ChangeButton.addActionListener(new ActionListener() { //변경 버튼 클릭 시 실행
     		public void actionPerformed(ActionEvent e) {
     			try {
-        			if(IDText.getText().equals("") || PWText.getText().equals("")) { //ID/PW 입력 창에 아무 값도 입력하지 않은 경우
+        			if(IDText.getText().equals("") || PWText.getText().equals("")) { //관리자 ID/PW 입력 창에 아무 값도 입력하지 않은 경우
             			JOptionPane.showMessageDialog(null, "관리자 ID 및 비밀번호는 최소 1자리 이상이여야 합니다");
             		} else { 
-        				//파일에 변경한 관리자 ID, 비밀번호를 적어놓음
+            			//입력받은 값을 관리자 데이터 파일에 관리자 ID/PW 값으로 설정함
             			String[] settingData = {width, height, pay, IDText.getText(), PWText.getText(), handicap, noPark};
             			
             			sct.setSetting(settingData);
@@ -134,7 +134,7 @@ public class GUIChangeLogin extends JFrame{
     	CancleButton.addActionListener(new ActionListener() { //취소 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		dispose();
-        		new GUIAdmin(); //관리자 설정 화면으로 이동
+        		new GUIAdmin(); //관리자 화면으로 이동
         	}
         });
     }

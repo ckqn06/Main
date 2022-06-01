@@ -37,11 +37,11 @@ public class GUIAdminLogin extends JFrame{
 
     private void formDesign() { //각 GUI 객체 설정
     	try {
-    		if(sct.isSetting()) { //관리자 데이터 파일에서 텍스트를 읽어들임
-            	String[] settingData = sct.getSetting();
+    		if(sct.isSetting()) { //서버를 통해 관리자 데이터 파일의 존재 여부가 확인된다면
+            	String[] settingData = sct.getSetting(); //관리자 데이터 파일을 읽어들임
             	
-            	ID = settingData[3]; //배열의 4번째에 저장된 ID의 내용을 저장하기 위한 변수
-            	PW = settingData[4]; //배열의 5번째에 저장된 비밀번호의 내용을 저장하기 위한 변수
+            	ID = settingData[3]; //배열의 4번째에 저장된 관리자 ID 값을 저장하기 위한 변수
+            	PW = settingData[4]; //배열의 5번째에 저장된 비밀번호의 값을 저장하기 위한 변수
     		}
         } catch(Exception e) { //예외 처리
         	System.out.println(e.getMessage());
@@ -106,8 +106,8 @@ public class GUIAdminLogin extends JFrame{
         loginButton.addActionListener(new ActionListener() { //로그인 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
             	
-            	if(sct.isSetting()) { //관리자 데이터 파일이 지정 경로에 존재하면서
-            		//관리자 데이터 파일에 설정된 아이디와 비밀번호가 ID/비밀번호 입력 창에 입력한 값과 동일하다면
+            	if(sct.isSetting()) { //관리자 데이터 파일이 존재한 상태에서
+            		//관리자 데이터 파일에 설정된 관리자 ID/PW 값이 관리자 ID/PW 입력 창에 입력한 값과 동일하다면
             		if(IDText.getText().equals(ID) && passwordText.getText().equals(PW)) {
             			if(op == 1) { //시스템을 실행시켜 첫 로그인을 진행하는 경우
             				dispose(); //현재 보여주고 있는 창(프레임)을 닫음
@@ -120,12 +120,12 @@ public class GUIAdminLogin extends JFrame{
                     		if(result == JOptionPane.YES_OPTION) //Yes를 선택할 경우
                     			System.exit(0); //시스템을 종료시킴
                 		}
-            		} else { //ID 또는 비밀번호가 틀리다면
+            		} else { //ID 혹은 비밀번호가 틀리다면
             			JOptionPane.showMessageDialog(null, "관리자 ID 혹은 비밀번호가 틀렸습니다");
             		}
             		
-            	} else { //관리자 데이터 파일이 지정 경로에 존재하지 않으면서
-            		if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) { //Default ID와 비밀번호가 맞다면
+            	} else { //관리자 데이터 파일이 존재하지 않은 상태에서
+            		if(IDText.getText().equals("admin") && passwordText.getText().equals("park123")) { //Default ID/PW가 맞다면
             			if(op == 1) {
                 			JOptionPane.showMessageDialog(null, "현재 시스템에 관리자 데이터 파일이 존재하지 않습니다.");
                         	dispose();

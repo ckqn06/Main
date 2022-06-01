@@ -65,16 +65,16 @@ public class GUIPayCarChoice extends JFrame{
         
         checkButton.addActionListener(new ActionListener() { //입력 버튼 클릭시 실행
             public void actionPerformed(ActionEvent e) {
-            	String[][] clientTableValue = sct.getTableData(); //DB파일에 저장된 고객 테이블의 값을 불러옴
+            	String[][] clientTableValue = sct.getTableData(); //서버를 통해 DB파일 내의 고객 테이블을 가져옴
             	
-            	for(int line = 0; line < clientTableValue.length; line++) {
+            	for(int line = 0; line < clientTableValue.length; line++) { //고객 테이블의 길이만큼 행을 읽어들임
             		//고객 테이블에 존재하는 차량 번호 중에 차량 번호 입력 창에서 입력한 값과 동일한 값이 존재한다면
             		if(clientTableValue[line][0].equals(carNumText.getText())) {
             			int diffTime = GUIMain.diffTime(clientTableValue[line][1]); //해당 값을 가진 차량의 주차 시간을 구함
-            			int pay = ((diffTime/15 + 1) * (tpay/4))/10;
+            			int pay = ((diffTime/15 + 1) * (tpay/4))/10; //주차 시간을 통해 주차 비용 계산
             			
             			dispose();
-            			//구한 주차 시간으로 주차 비용을 구한 뒤, 차량 번호와 고객이 지불해야 할 돈과 함께 결제 수단 화면으로 이동
+            			//차량 번호와 고객이 지불해야 할 돈과 함께 결제 수단 화면으로 이동
                     	new GUIPayMethodChoice(clientTableValue[line][0], pay*10);
                     	return;
             		} 

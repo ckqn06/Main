@@ -13,14 +13,14 @@ public class GUIPayCard extends JFrame{
     private JButton cancleButton = new JButton("결제 취소"); //결제 취소 버튼
     private JButton payButton = new JButton("결제하기"); //결제하기 버튼
     
-    private ServerConnection sct = new ServerConnection(); //서버 연결 객체s
+    private ServerConnection sct = new ServerConnection(); //서버 연결 객체
     
     private String carNum; //고객의 차량 번호를 저장하기 위한 변수
     private int pay; //고객이 지불해야 할 돈을 저장하기 위한 변수
 
     GUIPayCard(String carNum, int pay){ //화면 기본 설정
-    	this.carNum = carNum;
-    	this.pay = pay;
+    	this.carNum = carNum; //GUIPayMethodChoice 파일에서 받아온 차량 번호를 저장
+    	this.pay = pay; //GUIPayMethodChoice 파일에서 받아온 주차 금액을 저장
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
@@ -75,7 +75,7 @@ public class GUIPayCard extends JFrame{
             		//카드 번호 입력 창에 정수의 값이 입력된 경우 결제를 완료함
             		JOptionPane.showMessageDialog(null, "결제가 완료됐습니다");
             		
-                	sct.deleteData(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB파일에서 제거
+                	sct.deleteData(carNum); //결제를 완료한 차량 번호와 관련된 데이터를 DB에서 삭제
             		dispose();
                 	new GUIMain(); //메인 화면으로 이동
             	} catch (Exception e1) { //카드 번호 입력 창에 정수 외의 값이 입력된 경우 예외 발생

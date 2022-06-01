@@ -71,30 +71,30 @@ public class GUIMain extends JFrame {
     		//현재 시간에서 고객이 주차를 시작한 시간을 뺀 값인 주차 시간(ms단위)을 구한 뒤, 이를 다시 분 단위로 계산 
     		long diffTime = (System.currentTimeMillis() - cal.getTimeInMillis()) / 1000 / 60;
     		return (int)diffTime; //계산한 주차 시간을 반환
-    	}catch(Exception e) { 
+    	}catch(Exception e) { //예외 처리
     		System.out.println(e.getMessage());
     		return -1;
     	}
     }
 
     public void formDesign() { //각 GUI 객체 설정
-    	try { //관리자 데이터 파일에서 가로, 세로, 시간당 주차 비용 값이 적힌 텍스트를 읽어들임
+    	try { //관리자 데이터 파일에서 가로, 세로, 시간당 주차 비용 값을 읽어들임
         	String[] settingData = sct.getSetting();
         	
         	width = Integer.parseInt(settingData[0]);
         	height = Integer.parseInt(settingData[1]);
         	tpay = Integer.parseInt(settingData[2]);
-        } catch(Exception e) { //예외 처리
+        } catch(Exception e) {
         	System.out.println(e.getMessage());
         	e.printStackTrace();
         }
     	
-        this.add(p, BorderLayout.EAST); //고객 테이블을 위한 보조 프레임을 동쪽에 배치
+        this.add(p, BorderLayout.EAST); //고객 테이블을 위한 보조 프레임을 동쪽(오른쪽)에 배치
         p.setLayout(null);
         p.setBackground(new Color(238, 238, 238)); //배경색을 회색으로 설정
         p.setPreferredSize(new Dimension(500, 800)); //보조 프레임의 폭과 너비를 설정
 
-        this.add(p2, BorderLayout.WEST); //주차 공간 테이블을 위한 보조 프레임을 서쪽에 배치
+        this.add(p2, BorderLayout.WEST); //주차 공간 테이블을 위한 보조 프레임을 서쪽(왼쪽)에 배치
         p2.setLayout(null);
         p2.setBackground(new Color(113, 135, 190)); //배경색을 파란색으로 설정
         p2.setPreferredSize(new Dimension(500, 800));
@@ -187,13 +187,13 @@ public class GUIMain extends JFrame {
         quitButton.setSize(170, 50);
         quitButton.setFont(font);
         
-        String[][] clientTableValue = sct.getTableData(); //DB파일에 저장된 고객 테이블의 값을 불러옴
+        String[][] clientTableValue = sct.getTableData(); //서버를 통해 DB파일 내의 고객 테이블을 가져옴
         
         clientTable.setRowHeight(30);
-        //고객 테이블 내부 데이터를 다루기 위해서 DefaultTableModel을 불러옴
+        //고객 테이블에 저장된 데이터를 다루기 위해서 DefaultTableModel을 불러옴
         DefaultTableModel clientModel = (DefaultTableModel) clientTable.getModel();
         
-        for(int line = 0; line < clientTableValue.length; line++) {
+        for(int line = 0; line < clientTableValue.length; line++) { //고객 테이블의 길이만큼 행을 읽어들임
         	int diffTime = diffTime(clientTableValue[line][1]); //고객 테이블의 2번째 열에 주차 시간을 저장시킴
         	int pay = ((diffTime/15 + 1) * (tpay/4))/10; //주차 시간을 통해 주차 비용 계산
         	String parkTime = "" + (diffTime / 60)+"시간 " + (diffTime % 60)+"분"; //계산한 주차 시간(분 단위)을 시간, 분으로 표시
@@ -238,12 +238,12 @@ public class GUIMain extends JFrame {
     private void eventListner() { //버튼 클릭 이벤트 설정
         parkButton.addActionListener(new ActionListener() { //주차하기 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
-        		String[][] clientTableValue = sct.getTableData(); //DB파일 내의 고객 테이블을 가져옴
+        		String[][] clientTableValue = sct.getTableData();
         		
-        		//테이블의 행 값이 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
+        		//테이블의 길이(현재 주차장을 이용하는 고객 수)가 주차 공간 테이블의 가로*세로 값과 동일하다면 현재 주차장은 가득참
         		if(clientTableValue.length == width * height) {
         			JOptionPane.showMessageDialog(null, "현재 주차장이 가득 차서 주차가 불가능합니다");
-        		}else { //line의 값이 주차 공간의 가로*세로 값보다 작다면 현재 주차장은 여유 공간이 존재
+        		}else { //테이블의 길이가 주차 공간 테이블의 가로*세로 값보다 적다면 현재 주차장에 여유 공간이 존재함
         			uct.interrupt(); //스레드(UpdateClientTable)에 인터럽트를 걸음(데이터 갱신을 중지시킴)
         			dispose();
             		new GUIParking(); //주차하기 화면으로 이동
@@ -262,7 +262,7 @@ public class GUIMain extends JFrame {
         searchButton.addActionListener(new ActionListener() { //검색 버튼 클릭 시 실행
         	public void actionPerformed(ActionEvent e) {
         		String[][] clientTableValue = sct.getTableData();
-        		boolean isExist = false; //일치하는 차가 있는지 확인하는 변수
+        		boolean isExist = false; //동일한 차가 있는지 확인하는 변수
         		
         		for(int line = 0; line < clientTableValue.length; line++) {
         			if(clientTableValue[line][0].equals(carNumText.getText()) && clientTableValue[line][2].equals(placeNumText.getText()))
@@ -303,9 +303,5 @@ public class GUIMain extends JFrame {
         		new GUIAdminLogin(3); //시스템 종료 화면으로 이동
         	}
         });
-    }
-
-    public static void main(String[] args) { //실행 테스트를 위한 코드
-        new GUIMain();
     }
 }

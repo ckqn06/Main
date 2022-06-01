@@ -22,17 +22,19 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
     private int VerticalScrollBar = 0; //세로 스크롤의 위치
     private int HorizontalScrollBar = 0; //가로 스크롤의 위치
     
-    private String[] handicaps, noParks; //장애인 전용 주차 구역, 주차 불가 구역을 위한 변수
+    private String[] handicaps, noParks; //장애인 전용 주차 공간, 주차 불가 공간을 위한 변수
 	
 	public UpdateClientTable(GUIMain main, JTable clientTable) {
 		this.main = main;
 		this.clientTable = clientTable;
 		try {
-			String[] settingData = sct.getSetting();
+			String[] settingData = sct.getSetting(); //관리자 데이터 파일을 읽어들임
 	    	
-	    	width = Integer.parseInt(settingData[0]); //값 추출
+			//배열의 n번째에 저장된 가로, 세로, 시간당 주차 비용, 장애인 전용/주차 불가 공간 번호의 값을 저장하기 위한 변수
+	    	width = Integer.parseInt(settingData[0]);
 	    	height = Integer.parseInt(settingData[1]);
 	    	tpay = Integer.parseInt(settingData[2]);
+	    	//저장된 값을 split() 메서드를 이용해 ","를 기준으로 문자열을 나눈 뒤, 추출한 값을 출력
 	    	handicaps = settingData[5].split(",");
 	    	noParks = settingData[6].split(",");
 		}catch(Exception e) {}
@@ -52,7 +54,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 			        HorizontalScrollBar = placePane.getHorizontalScrollBar().getValue(); //현재 가로 스크롤의 위치를 가져옴
 				}
 				
-				String[][] clientTableValue = sct.getTableData(); //DB파일에 저장된 고객 테이블의 값을 불러옴
+				String[][] clientTableValue = sct.getTableData(); //서버를 통해 DB파일 내의 고객 테이블을 가져옴
 		       
 				placeView = new JTable(height, width) { //주차 공간 테이블의 행과 열을 관리자 데이터 파일에 적힌 가로/세로 값만큼 생성
 		        	@Override
@@ -60,7 +62,7 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		        		JComponent cell = (JComponent) super.prepareRenderer(renderer, row, column);
 		        		
-		        		for(int line = 0; line < clientTableValue.length; line++) {
+		        		for(int line = 0; line < clientTableValue.length; line++) { //고객 테이블의 길이만큼 행을 읽어들임
 		        			//주차 공간 테이블에 존재하는 위치 번호 중에 고객 테이블에 저장된 위치 번호와 동일한 값이 존재한다면
 		        			if(clientTableValue[line][2].equals(placeView.getValueAt(row, column).toString())) {
 		        				cell.setBackground(Color.RED); //해당 셀(위치 번호)의 배경을 빨간색으로 지정하여 주차된 공간임을 표시
@@ -68,15 +70,16 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        			}
 		        		}
 		        		
-	        			//주차 불가 구역으로 설정된 값이라면
+	        			//주차 불가 공간으로 설정된 값을 읽어들임
 	        			for(int i = 0; i < noParks.length; i++) {
+	        				//주차 공간 테이블에 존재하는 위치 번호 중에 관리자 데이터 파일에 저장된 주차 불가 공간 값과 동일한 값이 존재한다면
 	        				if(noParks[i].equals(placeView.getValueAt(row, column).toString())) {
 	        					cell.setBackground(Color.BLACK); //해당 셀(위치 번호)의 배경을 검은색으로 지정하여 주차 불가 공간임을 표시
 	        					return cell;
 	        				}
 	        			}
 		        		
-		        		//장애인 전용 주차 구역으로 설정된 값이라면
+		        		//장애인 전용 주차 공간으로 설정된 값이라면
 	        			for(int i = 0; i < handicaps.length; i++) { 
 	        				if(handicaps[i].equals(placeView.getValueAt(row, column).toString())) {
 	        					cell.setBackground(Color.GREEN); //해당 셀(위치 번호)의 배경을 초록색으로 지정하여 장애인 전용 공간임을 표시
@@ -88,26 +91,27 @@ public class UpdateClientTable extends Thread{ //고객 테이블의 데이터를 주기적으
 		        		return cell;
 		        	}
 		        };
+		        
 		        placeView.setRowHeight(87); //테이블의 열 높이 설정
 		        placeView.setTableHeader(null); //테이블의 헤더를 null로 설정 (= 헤더를 없앰)
 		        placeView.setEnabled(false); //셀의 클릭 기능을 비활성화함
 		        placeView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); //셀의 크기 조정
-		        placeView.setFont(font);
+		        placeView.setFont(font); //셀의 폰트 설정
 		        placeView.setBackground(Color.white); //셀의 기본 배경색은 흰색으로 지정
 		        
 		        dtcr.setHorizontalAlignment(SwingConstants.CENTER); //테이블의 셀을 가운데 정렬함
 		        for(int i=0; i<height; i++) { //관리자 데이터 파일에서 받아온 가로, 세로 값 만큼 반복
 		        	for(int j=0; j<width; j++) {
 		        		placeView.getColumnModel().getColumn(j).setPreferredWidth(87); //셀 너비 설정
-		            	placeView.getColumnModel().getColumn(j).setCellRenderer(dtcr);
+		            	placeView.getColumnModel().getColumn(j).setCellRenderer(dtcr); //셀 가운데 정렬
 		        		placeView.setValueAt("" + (char)(65+i) + (j+1), i, j); //주차 공간 테이블의 각 셀에 위치 번호를 부여함
 		        	}
 		        }	
 		        
-		        placePane = new JScrollPane(placeView);
-		        placePane.setLocation(17, 130);
-		        placePane.setSize(450, 539);
-		        placePane.getViewport().setBackground(new Color(113, 135, 190));
+		        placePane = new JScrollPane(placeView); //주차 공간 테이블의 스크롤바 생성
+		        placePane.setLocation(17, 130); //주차 공간 테이블의 스크롤바 위치 설정
+		        placePane.setSize(450, 539); //주차 공간 테이블의 스크롤바 크기 설정
+		        placePane.getViewport().setBackground(new Color(113, 135, 190)); //주차 공간 테이블의 배경색을 파란색으로 설정
 		        placePane.setBorder(BorderFactory.createEmptyBorder());
 		        placePane.getVerticalScrollBar().setMaximum(VerticalScrollBarMax);
 		        placePane.getHorizontalScrollBar().setMaximum(HorizontalScrollBarMax);

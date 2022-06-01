@@ -20,8 +20,8 @@ public class GUIPayMethodChoice extends JFrame{
     private int pay; //고객이 지불해야 할 돈을 저장하기 위한 변수
 
     GUIPayMethodChoice(String carNum, int pay){ //화면 기본 설정
-    	this.carNum = carNum;
-    	this.pay = pay;
+    	this.carNum = carNum; //GUIPayCarChoice 파일에서 받아온 차량 번호를 저장
+    	this.pay = pay; //GUIPayCarChoice 파일에서 받아온 주차 금액을 저장
         this.setTitle("무인 주차 관리 시스템");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.formDesign();
